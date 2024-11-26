@@ -5,8 +5,6 @@ public class Main {
 
         System.out.println("im gay");
 
-        System.out.println("Ahcham yaw");
-
 
 
 
