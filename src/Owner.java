@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static sun.net.httpserver.simpleserver.Main.main;
 
 public class Owner {
     protected ArrayList<Doctor> doctors ;
@@ -62,7 +61,7 @@ public class Owner {
         }while (c<0||c>4);
 
         if (c==0){
-            main();
+            Main.signOut();
         }else if (c==1) {
             Doctor tempDoc = new Doctor();
             System.out.println("personal information " + "\n Doctor full name");

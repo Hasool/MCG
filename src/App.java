@@ -2,10 +2,6 @@ import java.util.Objects;
 
 public class App {
 
-    public App app(){
-        return null;
-    }
-
     public void Choose(Owner owner){
         if (owner.doctors.isEmpty() && owner.patients.isEmpty()){
             owner.Owners("admin","admin",false);
@@ -69,7 +65,8 @@ public class App {
         System.out.println("0: sign out" +
                 "\n1: see your information" +
                 "\n2: update your password" +
-                (doc.patients.isEmpty()?"":"\n3: see all your patients"));
+                "\n2: add a patient" +
+                (doc.patients.isEmpty()?"":"\n4: see all your patients"));
 
         byte c;
         do{
@@ -92,9 +89,11 @@ public class App {
 
             if (ch==0){
                 Main.signOut();
-            } else if (ch==1) {
+            }
+            else if (ch==1) {
                 doc.setInfo();
-            }else {
+            }
+            else {
                 DocUser(doc);
             }
 
@@ -111,8 +110,30 @@ public class App {
             }
 
         }
-        else {
+        else if (c==3){
+            Patient tempPat = new Patient();
+            System.out.println("personal information " + "\nPatient full name");
+            tempPat.fullName = Main.reader.next();
 
+            System.out.println("Patient phone number");
+            do{
+                tempPat.phoneNumber = Main.reader.next();
+            }while (!tempPat.phoneNumber.startsWith("0"));
+
+            System.out.println("Patient age");
+            do{
+                tempPat.age = Main.reader.nextByte();
+            }while (tempPat.age<25 || tempPat.age>80);
+
+            System.out.println("Patient new code");
+            tempPat.code=Main.reader.next();
+
+            doc.patients.add(tempPat);
+            Main.owner.patients.add(tempPat);
+            System.out.println(tempPat.fullName + " is in the system");
+        }
+        else if (c==4 && !doc.patients.isEmpty()){
+            doc.getPatients();
         }
     }
 

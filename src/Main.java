@@ -9,6 +9,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        System.out.println("this is the first time i open that mean you are the owner");
         signOut();
     }
 
