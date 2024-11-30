@@ -5,26 +5,33 @@ import java.util.Objects;
 public class Owner {
     protected ArrayList<Doctor> doctors ;
     protected ArrayList<Patient> patients ;
+    private String password;
+    private String name;
 
     public Owner(){
         doctors = new ArrayList<>();
         patients = new ArrayList<>();
+        name = "amin";
+        password = "amin";
     }
 
-    public void Owners(String name, String password, boolean B){
+    public void Owners(boolean B){
         if (B){
             System.out.println("hi owner" +
                     "\nyou can do a lot of things from her " +
                     "\n0: sign out" +
                     "\n1: doctors settings " +
-                    "\n2: patient settings");
+                    "\n2: patient settings" +
+                    "\n3: update the name & password");
             int c;
             do {
                 c = Main.reader.nextByte();
-            }while (c<0||c>2);
+            }while (c<0||c>3);
             if(c==1)DocSettings();
             else if(c==2) {
                 PatientSettings();
+            } else if (c==3) {
+                change();
             }else {
                 Main.signOut();
             }
@@ -33,15 +40,16 @@ public class Owner {
             String tempString = Main.reader.next();
             if (!Objects.equals(tempString, name)){
                 System.out.println("name is wrong");
-                Owners("admin","admin",false);
-            }else{
+                Owners(false);
+            }
+            else{
                 System.out.println("enter the password ");
                 tempString = Main.reader.next();
                 if (!Objects.equals(tempString, password)){
                     System.out.println("password is wrong");
-                    Owners("admin","admin",false);
+                    Owners(false);
                 }else{
-                    Owners("admin","admin",true);
+                    Owners(true);
                 }
             }
         }
@@ -78,7 +86,7 @@ public class Owner {
             }while (tempDoc.age<25 || tempDoc.age>80);
 
             System.out.println("id");
-            tempDoc.Id=Main.reader.next();
+            tempDoc.setId();
 
             doctors.add(tempDoc);
             System.out.println(tempDoc.fullName + " is in the system");
@@ -121,7 +129,7 @@ public class Owner {
             }
             System.out.println("there's no doctor with those information");
         }
-        Owners("admin","admin",true);
+        Owners(true);
     }
 
 
@@ -196,6 +204,46 @@ public class Owner {
             System.out.println("there's no doctor with those information");
         }
 
-        Owners("admin","admin",true);
+        Owners(true);
+    }
+
+
+    void change(){
+        System.out.println("0:return" +
+                "\n1:change the name" +
+                "\n2:change the password");
+
+        int c;
+        do {
+            c = Main.reader.nextByte();
+        }while (c<0||c>2);
+        if(c==1){
+            System.out.println("enter the new name");
+            String newName = Main.reader.next();
+            setName(newName);
+            System.out.println("name changed");
+        }
+        else if(c==2) {
+            System.out.println("enter the old password");
+            String newName;
+            do {
+                newName = Main.reader.next();
+            }while (!Objects.equals(newName, name));
+            setName(newName);
+            System.out.println("password changed");
+        }
+        Owners(true);
+
+
+    }
+
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
