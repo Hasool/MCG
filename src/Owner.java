@@ -11,8 +11,8 @@ public class Owner {
     public Owner(){
         doctors = new ArrayList<>();
         patients = new ArrayList<>();
-        name = "amin";
-        password = "amin";
+        name = "admin";
+        password = "admin";
     }
 
     public void Owners(boolean B){
