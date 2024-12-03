@@ -6,6 +6,19 @@ public class Patient extends Human{
     protected ArrayList<MedicalHistory> medicalHistories;
     protected String code;
 
+    public String getAppointment() {
+        return appointment.toString();
+    }
+
+    public void getMedicalHistories() {
+        for (MedicalHistory medicalHistory : medicalHistories){
+            medicalHistory.toString();
+        }
+    }
+
+    public void setAppointment(Owner owner , Doctor doctor) {
+        appointment = new MedicalHistory(owner,doctor);
+    }
 
     public void setInfo() {
         System.out.println("-------------------");

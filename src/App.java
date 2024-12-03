@@ -112,6 +112,7 @@ public class App {
         }
         else if (c==3){
             Patient tempPat = new Patient();
+            tempPat.setAppointment(null,doc);
             System.out.println("personal information " + "\nPatient full name");
             tempPat.fullName = Main.reader.next();
 
@@ -209,30 +210,10 @@ public class App {
 
             }
             else if (c==3){
-                Patient tempPat = new Patient();
-                System.out.println("personal information " + "\nPatient full name");
-                tempPat.fullName = Main.reader.next();
-
-                System.out.println("Patient phone number");
-                do{
-                    tempPat.phoneNumber = Main.reader.next();
-                }while (!tempPat.phoneNumber.startsWith("0"));
-
-                System.out.println("Patient age");
-                do{
-                    tempPat.age = Main.reader.nextByte();
-                }while (tempPat.age<0);
-
-                tempPat.code = tempPat.fullName + tempPat.age;
-
-                System.out.println("the Patient code is : " + tempPat.code);
-
-                doc.patients.add(tempPat);
-                Main.owner.patients.add(tempPat);
-                System.out.println(tempPat.fullName + " is in the system");
+                System.out.println(pat.getAppointment());
             }
-            else if (c==4 && !doc.patients.isEmpty()){
-                doc.getPatients();
+            else if (c==4 && !pat.medicalHistories.isEmpty()){
+                pat.getAppointment();
             }
 
         }

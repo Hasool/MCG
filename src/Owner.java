@@ -198,7 +198,20 @@ public class Owner {
             for (Patient patient : patients){
                 if ((patient.fullName.equals(tempName)) && (patient.code.equals(tempCode))){
                     System.out.println( patient.toString() + " , founded " +
+                            "\n0: return" +
                             "\n1: add an appointment");
+                    byte ch ;
+                    do {
+                        ch = Main.reader.nextByte();
+                    }while (ch<0 || ch>1);
+                    if(ch==1){
+                        patient.setAppointment(this,null);
+                    }else {
+                        Owners(true);
+                    }
+                    break;
+
+
                 }
             }
             System.out.println("there's no doctor with those information");
