@@ -4,6 +4,7 @@ public class Main {
 
     public static Scanner reader = new Scanner(System.in);
     public static Owner owner = new Owner();
+    static Frame frame = new Frame();
 
 
     public static void signOut() {
@@ -18,7 +19,7 @@ public class Main {
 
 
         System.out.println("First-time setup: You are the owner ." +
-                "\n  just enter admin as name and password you can change them in the future");
+                "\njust enter admin as name and password you can change them in the future");
         signOut(); 
     }
 

@@ -1,3 +1,6 @@
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -15,8 +18,279 @@ public class Owner {
         password = "admin";
     }
 
-    public void Owners(boolean B){
+
+    public void Owners(boolean isLoggedIn) {
+        Main.frame.getContentPane().removeAll();
+
+        if (isLoggedIn) {
+            // Owner Panel on the left
+            JPanel ownerPanel = new JPanel();
+            ownerPanel.setLayout(new BoxLayout(ownerPanel, BoxLayout.X_AXIS));
+            ownerPanel.setBackground(new Color(0x98D1FA));
+
+            ownerPanel.add(Box.createRigidArea(new Dimension(10, 50)));
+
+            JLabel welcomeLabel = new JLabel("Welcome, Owner!");
+            welcomeLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+            ownerPanel.add(welcomeLabel);
+
+            ownerPanel.add(Box.createRigidArea(new Dimension(50, 50)));
+
+            JButton doctorSettingsButton = new JButton("Doctor Settings");
+            doctorSettingsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+            doctorSettingsButton.setMaximumSize(new Dimension(200, 30));
+            doctorSettingsButton.addActionListener(e -> {
+                Main.frame.getContentPane().removeAll();
+                Owners(true);
+                Main.frame.add(DocSettings(), BorderLayout.WEST);
+                Main.frame.revalidate();
+                Main.frame.repaint();
+            });
+            ownerPanel.add(doctorSettingsButton);
+
+            ownerPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+
+            JButton patientSettingsButton = new JButton("Patient Settings");
+            patientSettingsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+            patientSettingsButton.setMaximumSize(new Dimension(200, 30));
+            patientSettingsButton.addActionListener(e -> PatientSettings());
+            ownerPanel.add(patientSettingsButton);
+
+            ownerPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+
+            JButton changeCredentialsButton = new JButton("Change Name/Password");
+            changeCredentialsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+            changeCredentialsButton.setMaximumSize(new Dimension(200, 30));
+            changeCredentialsButton.addActionListener(e -> change());
+            ownerPanel.add(changeCredentialsButton);
+
+            ownerPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+
+            ownerPanel.add(Box.createHorizontalGlue());
+
+            JButton signOutButton = new JButton("Sign Out");
+            signOutButton.setAlignmentY(Component.CENTER_ALIGNMENT);
+            signOutButton.setFocusable(false);
+            signOutButton.setMaximumSize(new Dimension(200, 30));
+            signOutButton.addActionListener(e -> Main.signOut());
+            ownerPanel.add(signOutButton);
+
+            ownerPanel.add(Box.createRigidArea(new Dimension(20, 50)));
+
+            Main.frame.add(ownerPanel, BorderLayout.NORTH);
+        } else {
+            // Login Panel (Unchanged)
+            JPanel loginPanel = new JPanel();
+            loginPanel.setLayout(new GridBagLayout());
+            loginPanel.setBackground(Color.lightGray);
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(5, 5, 5, 5); // Padding
+
+            JLabel nameLabel = new JLabel("Enter your name:");
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            loginPanel.add(nameLabel, gbc);
+
+            JTextField nameField = new JTextField(15);
+            gbc.gridx = 1;
+            loginPanel.add(nameField, gbc);
+
+            JLabel passwordLabel = new JLabel("Enter your password:");
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            loginPanel.add(passwordLabel, gbc);
+
+            JPasswordField passwordField = new JPasswordField(15);
+            gbc.gridx = 1;
+            loginPanel.add(passwordField, gbc);
+
+            JButton submitButton = new JButton("Submit");
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            gbc.gridwidth = 2;
+            submitButton.addActionListener(e -> {
+                String inputName = nameField.getText();
+                String inputPassword = new String(passwordField.getPassword());
+
+                if (validateOwner(inputName, inputPassword)) {
+                    Owners(true);
+                } else {
+                    JOptionPane.showMessageDialog(Main.frame, "Invalid credentials. Try again.");
+                }
+            });
+            loginPanel.add(submitButton, gbc);
+
+            Main.frame.add(loginPanel, BorderLayout.CENTER);
+        }
+
+        Main.frame.revalidate();
+        Main.frame.repaint();
+    }
+
+
+
+
+
+    private boolean validateOwner(String inputName, String inputPassword) {
+        return Objects.equals(inputName, name) && Objects.equals(inputPassword, password);
+    }
+
+    public JPanel DocSettings() {
+
+        JPanel DocSettingsPanel = new JPanel();
+        DocSettingsPanel.setLayout(new BoxLayout(DocSettingsPanel, BoxLayout.PAGE_AXIS));
+        DocSettingsPanel.setBackground(new Color(0x98D1FA));
+
+        DocSettingsPanel.add(Box.createRigidArea(new Dimension(250, 20)));
+
+        JLabel titleLabel = new JLabel("Doctor Settings");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        DocSettingsPanel.add(titleLabel);
+
+        DocSettingsPanel.add(Box.createRigidArea(new Dimension(250, 20)));
+
+        // Add options for doctor settings
+        JButton addDoctorButton = new JButton("Add Doctor");
+        addDoctorButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        addDoctorButton.setMaximumSize(new Dimension(200, 30));
+        addDoctorButton.addActionListener(e -> {
+            Main.frame.getContentPane().removeAll();
+            Owners(true);
+            Main.frame.add(DocSettings(), BorderLayout.WEST);
+            Main.frame.add(addDoc(),BorderLayout.CENTER);
+            Main.frame.revalidate();
+            Main.frame.repaint();
+        });
+        DocSettingsPanel.add(addDoctorButton);
+
+        DocSettingsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JButton viewDoctorsButton = new JButton("View All Doctors");
+        viewDoctorsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        viewDoctorsButton.setMaximumSize(new Dimension(200, 30));
+        viewDoctorsButton.setEnabled(!doctors.isEmpty());
+        viewDoctorsButton.addActionListener(e -> System.out.println("View All Doctors"));
+        DocSettingsPanel.add(viewDoctorsButton);
+
+        DocSettingsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JButton deleteDoctorButton = new JButton("Delete Doctor");
+        deleteDoctorButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deleteDoctorButton.setMaximumSize(new Dimension(200, 30));
+        deleteDoctorButton.setEnabled(!doctors.isEmpty());
+        deleteDoctorButton.addActionListener(e -> System.out.println("Delete Doctor"));
+        DocSettingsPanel.add(deleteDoctorButton);
+
+        DocSettingsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JButton updateDoctorButton = new JButton("Update Doctor");
+        updateDoctorButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        updateDoctorButton.setMaximumSize(new Dimension(200, 30));
+        updateDoctorButton.setEnabled(!doctors.isEmpty());
+        updateDoctorButton.addActionListener(e -> System.out.println("Update Doctor"));
+        DocSettingsPanel.add(updateDoctorButton);
+
+        DocSettingsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        DocSettingsPanel.add(Box.createVerticalGlue());
+
+        JButton backButton = new JButton("Back");
+        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backButton.setMaximumSize(new Dimension(200, 30));
+        backButton.addActionListener(e -> Owners(true));
+        DocSettingsPanel.add(backButton);
+
+        DocSettingsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        return DocSettingsPanel;
+    }
+
+
+
+
+    protected JPanel addDoc() { // Clear previous content
+        Doctor tempDoc = new Doctor();
+        JPanel addDocPanel = new JPanel(new BorderLayout());
+
+        // Colors for stages
+        Color ended = new Color(0x53BA61);
+        Color current = new Color(0x82DBEF);
+        Color next = new Color(0xFF0000);
+
+
+        JPanel stages = new JPanel();
+        stages.setBackground(next);
+        stages.setLayout(new BoxLayout(stages, BoxLayout.PAGE_AXIS));
+
+
+        JPanel personalInformation = new JPanel();
+        personalInformation.setLayout(new BoxLayout(personalInformation, BoxLayout.X_AXIS));
+        personalInformation.setPreferredSize(new Dimension(200,50));
+        personalInformation.setMaximumSize(new Dimension(200, 50));
+        personalInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
+        personalInformation.setBackground(current);
+
+        JLabel PI = new JLabel("Personal Information");
+        ImageIcon PIImage = new ImageIcon("resources/businessman.png");
+        Image scaledPIImage = PIImage.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        ImageIcon PIImageIcon = new ImageIcon(scaledPIImage);
+        JLabel PIIcon = new JLabel(PIImageIcon);
+        personalInformation.add(PI);
+        personalInformation.add(PIIcon);
+
+        stages.add(personalInformation);
+
+        JPanel professionalInformation = new JPanel();
+        professionalInformation.setLayout(new BoxLayout(professionalInformation, BoxLayout.X_AXIS));
+        professionalInformation.setPreferredSize(new Dimension(200,50));
+        professionalInformation.setMaximumSize(new Dimension(200, 50));
+        professionalInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
+        professionalInformation.setBackground(next);
+
+        JLabel PrI = new JLabel("professional Information");
+        ImageIcon PrIImage = new ImageIcon("resources/expertise.png");
+        Image scaledPrIImage = PrIImage.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        ImageIcon PrIImageIcon = new ImageIcon(scaledPrIImage);
+        JLabel PrIIcon = new JLabel(PrIImageIcon);
+        professionalInformation.add(PrI);
+        professionalInformation.add(PrIIcon);
+        stages.add(professionalInformation);
+
+        JPanel saveInformation = new JPanel();
+        saveInformation.setLayout(new BoxLayout(saveInformation , BoxLayout.X_AXIS));
+        saveInformation.setPreferredSize(new Dimension(200,50));
+        saveInformation.setMaximumSize(new Dimension(200, 50));
+        saveInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
+        saveInformation.setBackground(next);
+
+        JLabel SI = new JLabel("professional Information");
+        ImageIcon SIImage = new ImageIcon("resources/bookmark.png");
+        Image scaledSIImage = SIImage.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        ImageIcon SIImageIcon = new ImageIcon(scaledSIImage);
+        JLabel SIIcon = new JLabel(SIImageIcon);
+        SIIcon.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        saveInformation.add(SI);
+        saveInformation.add(SIIcon);
+        stages.add(saveInformation);
+
+        // Main Content Panels
+        JPanel personalInfo = new JPanel();
+        personalInfo.setBackground(new Color(0x0E2453));
+
+
+        addDocPanel.add(stages,BorderLayout.WEST);
+        addDocPanel.add(personalInfo,BorderLayout.CENTER);
+
+        return addDocPanel;
+
+    }
+
+
+/*    public void Owners(boolean B){
         if (B){
+            Main.frame.repaint();
             System.out.println("hi owner" +
                     "\nyou can do a lot of things from her " +
                     "\n0: sign out" +
@@ -36,6 +310,57 @@ public class Owner {
                 Main.signOut();
             }
         }else{
+            Main.frame.getContentPane().setBackground(new Color(0x828C8C));
+
+            JLabel label = new JLabel("Owner");
+            label.setBounds(450,100,60,20);
+
+            JLabel name = new JLabel("enter your name");
+            name.setBounds(100,200,150,20);
+
+            JTextField textField = new JTextField(60);
+            textField.setBounds(455,200,150,20);
+            textField.setFocusable(true);
+
+            JLabel password = new JLabel("enter your password");
+            password.setBounds(100,300,150,20);
+
+            JTextField passwordField = new JTextField(60);
+            passwordField.setBounds(455,300,150,20);
+            passwordField.setFocusable(true);
+
+            // Create JButton
+            JButton button = new JButton("Submit");
+            button.setFocusable(true);
+            button.setBackground(Color.cyan);
+            button.setBounds(455,450,100,40);
+
+            // Add ActionListener to button
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String inputName = textField.getText();
+                    String inputPassword = passwordField.getText();
+
+                    if(Objects.equals(inputName, Main.owner.name) && Objects.equals(inputPassword, Main.owner.password)){
+                        Owners(true);
+                    }else {
+                        Owners(false);
+                    }
+
+                }
+            });
+
+            Main.frame.add(label);
+            Main.frame.add(name);
+            Main.frame.add(textField);
+            Main.frame.add(passwordField);
+            Main.frame.add(password);
+            Main.frame.add(button);
+
+            Main.frame.repaint();
+
+
             System.out.println("enter the name ");
             String tempString = Main.reader.next();
             if (!Objects.equals(tempString, name)){
@@ -53,10 +378,11 @@ public class Owner {
                 }
             }
         }
-    }
+    }*/
 
 
-    public void DocSettings() {
+
+    /*public void DocSettings() {
         System.out.println("hello in doctors settings" + "\n0: exit to owner page" + "\n1: add a doctor" +
                 (this.doctors.isEmpty()
                         ?""
@@ -130,7 +456,7 @@ public class Owner {
             System.out.println("there's no doctor with those information");
         }
         Owners(true);
-    }
+    }*/
 
 
     public void PatientSettings() {
@@ -156,9 +482,7 @@ public class Owner {
             }while (!tempPat.phoneNumber.startsWith("0"));
 
             System.out.println("Patient age");
-            do{
-                tempPat.age = Main.reader.nextByte();
-            }while (tempPat.age<25 || tempPat.age>80);
+            tempPat.age = Main.reader.nextByte();
 
             System.out.println("Patient new code");
             tempPat.code=Main.reader.next();
