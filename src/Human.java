@@ -1,7 +1,7 @@
 public class Human {
     protected String fullName;
     protected String phoneNumber;
-    protected byte age;
+    protected String age;
 
 
     public void setFullName() {

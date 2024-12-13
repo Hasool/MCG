@@ -122,9 +122,9 @@ public class App {
             }while (!tempPat.phoneNumber.startsWith("0"));
 
             System.out.println("Patient age");
-            do{
-                tempPat.age = Main.reader.nextByte();
-            }while (tempPat.age<0);
+ //           do{
+ //               tempPat.age = Main.reader.nextByte();
+ //           }while (tempPat.age<0);
 
             tempPat.code = tempPat.fullName + tempPat.age;
 

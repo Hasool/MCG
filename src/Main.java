@@ -15,9 +15,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-
-
-
         System.out.println("First-time setup: You are the owner ." +
                 "\njust enter admin as name and password you can change them in the future");
         signOut(); 
