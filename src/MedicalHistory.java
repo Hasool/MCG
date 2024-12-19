@@ -12,7 +12,6 @@ public class MedicalHistory {
 
 
     public MedicalHistory(Owner owner,Doctor doctor) {
-        this.date = createAppointment();
         if (owner!=null){
             this.doc = assignDoctor();
         }else {
@@ -21,25 +20,15 @@ public class MedicalHistory {
 
     }
 
-    private LocalDateTime createAppointment() {
+     static LocalDateTime createAppointment(String dmy, String hm) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
 
-        LocalDate date;
-        do {
-            System.out.println("Enter appointment date (dd/MM/yyyy):");
-            String dateInput = Main.reader.next();
-            date = parseDate(dateInput, dateFormatter);
-        } while (date == null);
+        LocalDate date = parseDate(dmy, dateFormatter);
 
 
-        LocalTime time;
-        do {
-            System.out.println("Enter appointment time (HH:mm):");
-            String timeInput = Main.reader.next();
-            time = parseTime(timeInput, timeFormatter);
-        } while (time == null);
+        LocalTime time = parseTime(hm, timeFormatter);
 
         return LocalDateTime.of(date, time);
     }

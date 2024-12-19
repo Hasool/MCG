@@ -2,12 +2,12 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static Scanner reader = new Scanner(System.in);
-    public static Owner owner = new Owner();
+    static Scanner reader = new Scanner(System.in);
+    static Owner owner = new Owner();
     static Frame frame = new Frame();
 
 
-    public static void signOut() {
+    static void signOut() {
         App app = new App();
         app.Choose(owner);
     }

@@ -106,16 +106,25 @@ public class Doctor extends Human{
 
     public void setId(String z1 , String z2) {
 
-        Id = z1+ z2;
+        if (z1==null || z2==null){
+            if (z1 == null){
+                Id = Id.substring(0,2) + z2 + Id.substring(6);
+            }else {
+                Id = z1 + Id.substring(2);
+            }
+        }else{
+            Id = z1+ z2;
 
-        Random random = new Random();
-        String z3;
-        do {
-            int number = random.nextInt(1000);
-            z3 = String.format("%03d", number);
-        }while (IsNotNew(Id,z3));
+            Random random = new Random();
+            String z3;
+            do {
+                int number = random.nextInt(1000);
+                z3 = String.format("%03d", number);
+            }while (IsNotNew(Id,z3));
 
-        Id = Id + z3;
+            Id = Id + z3;
+        }
+
 
     }
 

@@ -81,6 +81,15 @@ public class Patient extends Human{
         app.PatUser(this);
     }
 
+    protected Doctor getDocFromId(String id ){
+        for (Doctor doctor : Main.owner.doctors){
+            if (Objects.equals(doctor.Id,id)){
+                return doctor;
+            }
+        }
+        return null ;
+    }
+
     @Override
     public String toString(){
         return (this.fullName + ", " + this.phoneNumber + ", " + this.age  );
