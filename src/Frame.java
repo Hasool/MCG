@@ -12,7 +12,5 @@ public class Frame extends JFrame {
         ImageIcon icon = new ImageIcon("gcm.png");
         this.setIconImage(icon.getImage());
         this.setLayout(new BorderLayout());
-
-
     }
 }

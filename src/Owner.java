@@ -68,7 +68,13 @@ public class Owner {
             JButton changeCredentialsButton = new JButton("Change Name/Password");
             changeCredentialsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
             changeCredentialsButton.setMaximumSize(new Dimension(200, 30));
-            changeCredentialsButton.addActionListener(e -> change());
+            changeCredentialsButton.addActionListener(e -> {
+                Main.frame.getContentPane().removeAll();
+                Owners(true);
+                Main.frame.add(change(), BorderLayout.CENTER);
+                Main.frame.revalidate();
+                Main.frame.repaint();
+            });
             ownerPanel.add(changeCredentialsButton);
 
             ownerPanel.add(Box.createRigidArea(new Dimension(30, 0)));
@@ -968,7 +974,7 @@ public class Owner {
             Main.frame.getContentPane().removeAll();
             Owners(true);
             Main.frame.add(DocSettings(), BorderLayout.WEST);
-            //Main.frame.add(deletePatient(),BorderLayout.CENTER);
+            Main.frame.add(deletePatient(),BorderLayout.CENTER);
             Main.frame.revalidate();
             Main.frame.repaint();
         });
@@ -1331,7 +1337,7 @@ public class Owner {
             editIcon.addActionListener(e->{
                 Main.frame.getContentPane().removeAll();
                 Owners(true);
-                //Main.frame.add(editPatient(0,patient), BorderLayout.WEST);
+                Main.frame.add(editPatient(patient), BorderLayout.WEST);
                 Main.frame.revalidate();
                 Main.frame.repaint();
             });
@@ -1369,129 +1375,246 @@ public class Owner {
         return container;
     }
 
+    protected JPanel deletePatient(){
+        JPanel deletePanel = new JPanel();
+        deletePanel.setLayout(new BorderLayout());
+        JPanel searchPanel = new JPanel();
+        searchPanel.setLayout(new GridBagLayout());
+        searchPanel.setBackground(Color.lightGray);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        JLabel nameLabel = new JLabel("Enter the patient full name :");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        searchPanel.add(nameLabel, gbc);
+
+        JTextField nameField = new JTextField(15);
+        gbc.gridx = 1;
+        searchPanel.add(nameField, gbc);
+
+        JLabel codeLabel = new JLabel("Enter the patient password :");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        searchPanel.add(codeLabel, gbc);
+
+        JTextField codeField = new JTextField(15);
+        gbc.gridx = 1;
+        searchPanel.add(codeField, gbc);
 
 
-
-
-
-
-
-    public void PatientSettings() {
-        System.out.println("hello in patient settings" + "\n0: exit to owner page" + "\n1: add a patient" +
-                (this.patients.isEmpty()
-                        ?""
-                        :("\n2: see all patients\n3: delete a patient\n4: update a patient")
-                ));
-
-        int c;
-        do {
-            c = Main.reader.nextByte();
-        }while (c<0||c>4);
-
-        if (c==1) {
-            Patient tempPat = new Patient();
-            System.out.println("personal information " + "\nPatient full name");
-            tempPat.fullName = Main.reader.next();
-
-            System.out.println("Patient phone number");
-            do{
-                tempPat.phoneNumber = Main.reader.next();
-            }while (!tempPat.phoneNumber.startsWith("0"));
-
-            System.out.println("Patient age");
-            //tempPat.age = Main.reader.nextByte();
-
-            System.out.println("Patient new code");
-            tempPat.code=Main.reader.next();
-
-            patients.add(tempPat);
-            System.out.println(tempPat.fullName + " is in the system");
-
-        } else if (c==2 && !patients.isEmpty()) {
-            for (Patient patient : patients){
-                System.out.println(patient.toString());
-            }
-        } else if (c==3 && !patients.isEmpty()) {
-            System.out.println("enter patient name");
-            String tempName = Main.reader.next();
-
-            System.out.println("enter patient code");
-            String tempCode = Main.reader.next();
-
-            int i = patients.size();
-            for (Patient patient : patients){
-                if ((patient.fullName.equals(tempName)) && (patient.code.equals(tempCode))){
-                    System.out.println( patient.toString() + " , is deleted");
-                    patients.remove(patient);
-                    break;
+        JButton submitButton = new JButton("search");
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        submitButton.addActionListener(e -> {
+            for (Patient patient : Main.owner.patients){
+                if (Objects.equals(patient.fullName,nameField.getText()) && Objects.equals(patient.code,codeField.getText())){
+                    JOptionPane.showMessageDialog(Main.frame, (patient.toString()+" have been deleted"));
+                    Main.owner.patients.remove(patient);
+                    Main.frame.getContentPane().removeAll();
+                    Owners(true);
+                    Main.frame.add(PatSettings(), BorderLayout.WEST);
+                    Main.frame.revalidate();
+                    Main.frame.repaint();
                 }
             }
-            if (i==patients.size()){
-                System.out.println("there's no patient with those information");
-            }
-        } else if (c==4 && !patients.isEmpty()) {
-            System.out.println("enter patient name");
-            String tempName = Main.reader.next();
+            JOptionPane.showMessageDialog(Main.frame, "Invalid name or password. Try again.");
+            Main.frame.getContentPane().removeAll();
+            Owners(true);
+            Main.frame.add(PatSettings(), BorderLayout.WEST);
+            Main.frame.add(deletePatient(),BorderLayout.CENTER);
+            Main.frame.revalidate();
+            Main.frame.repaint();
+        });
+        searchPanel.add(submitButton, gbc);
+        deletePanel.add(searchPanel,BorderLayout.CENTER);
+        return deletePanel;
+    }
 
-            System.out.println("enter patient code");
-            String tempCode = Main.reader.next();
+    protected JPanel editPatient(Patient patient){
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
 
-            for (Patient patient : patients){
-                if ((patient.fullName.equals(tempName)) && (patient.code.equals(tempCode))){
-                    System.out.println( patient.toString() + " , founded " +
-                            "\n0: return" +
-                            "\n1: add an appointment");
-                    byte ch ;
-                    do {
-                        ch = Main.reader.nextByte();
-                    }while (ch<0 || ch>1);
-                    if(ch==1){
-                        patient.setAppointment(this,null);
-                    }else {
-                        Owners(true);
-                    }
-                    break;
+        JPanel navPanel = new JPanel();
+        navPanel.setLayout(new BoxLayout(navPanel,BoxLayout.PAGE_AXIS));
+        navPanel.setBackground(new Color(0x85B9DE));
 
+        navPanel.add(Box.createRigidArea(new Dimension(250, 20)));
 
-                }
-            }
-            System.out.println("there's no doctor with those information");
-        }
+        JButton editPatientButton = new JButton("Edit Patient");
+        editPatientButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        editPatientButton.setMaximumSize(new Dimension(200, 30));
+        editPatientButton.addActionListener(e -> {
+            Main.frame.getContentPane().removeAll();
+            Owners(true);
+            Main.frame.add(PatSettings(), BorderLayout.WEST);
+            Main.frame.add(editPatient(patient),BorderLayout.CENTER);
+            Main.frame.revalidate();
+            Main.frame.repaint();
+        });
+        navPanel.add(editPatientButton);
 
-        Owners(true);
+        return panel;
     }
 
 
-    void change(){
-        System.out.println("0:return" +
-                "\n1:change the name" +
-                "\n2:change the password");
 
-        int c;
-        do {
-            c = Main.reader.nextByte();
-        }while (c<0||c>2);
-        if(c==1){
-            System.out.println("enter the new name");
-            String newName = Main.reader.next();
-            setName(newName);
-            System.out.println("name changed");
-        }
-        else if(c==2) {
-            System.out.println("enter the old password");
-            String newName;
-            do {
-                newName = Main.reader.next();
-            }while (!Objects.equals(newName, name));
-            setName(newName);
-            System.out.println("password changed");
-        }
-        Owners(true);
+    public JPanel change() {
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setTopComponent(changeName());
+        splitPane.setBottomComponent(changePassword());
+        splitPane.setDividerSize(2);
+        splitPane.setDividerLocation(350);
+        splitPane.setResizeWeight(0.5);
 
-
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(splitPane, BorderLayout.CENTER);
+        return panel;
     }
 
+    protected JPanel changeName() {
+        JPanel changeName = new JPanel();
+        changeName.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        JLabel CNTitle = new JLabel("Change the Name");
+        CNTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        changeName.add(CNTitle, gbc);
+
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        JLabel NName = new JLabel("Enter the New Name:");
+        changeName.add(NName, gbc);
+
+        gbc.gridx = 1;
+        JTextField nameField = new JTextField();
+        nameField.setPreferredSize(new Dimension(200, 25));
+        changeName.add(nameField, gbc);
+
+        gbc.gridy = 2;
+        gbc.gridx = 0;
+        JLabel CNName = new JLabel("Confirm the New Name:");
+        changeName.add(CNName, gbc);
+
+        gbc.gridx = 1;
+        JTextField confNameField = new JTextField();
+        confNameField.setPreferredSize(new Dimension(200, 25));
+        changeName.add(confNameField, gbc);
+
+        gbc.gridy = 3;
+        gbc.gridx = 0;
+        JLabel password = new JLabel("Enter the Password:");
+        changeName.add(password, gbc);
+
+        gbc.gridx = 1;
+        JPasswordField passwordField = new JPasswordField();
+        passwordField.setPreferredSize(new Dimension(200, 25));
+        changeName.add(passwordField, gbc);
+
+        gbc.gridy = 4;
+        gbc.gridx = 1;
+        JButton submit = new JButton("Submit");
+        submit.addActionListener(e->{
+            if (
+                    Objects.equals(passwordField.getText(),this.password)
+                    &&
+                    Objects.equals(nameField.getText(),confNameField.getText())
+            ){
+                setName(nameField.getText());
+                JOptionPane.showMessageDialog(Main.frame, "the name now is "+nameField.getText());
+                Main.frame.getContentPane().removeAll();
+                Owners(true);
+            }else{
+                JOptionPane.showMessageDialog(Main.frame, "somthing seem wrong. Try again.");
+                Main.frame.getContentPane().removeAll();
+                Owners(true);
+                Main.frame.add(change(), BorderLayout.CENTER);
+            }
+        });
+
+        changeName.add(submit, gbc);
+
+        return changeName;
+    }
+
+    protected JPanel changePassword() {
+        JPanel changePassword = new JPanel();
+        changePassword.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        JLabel CPTitle = new JLabel("Change the Password");
+        CPTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        changePassword.add(CPTitle, gbc);
+
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        JLabel NPassword = new JLabel("Enter the New Password:");
+        changePassword.add(NPassword, gbc);
+
+        gbc.gridx = 1;
+        JTextField passwordField3 = new JTextField();
+        passwordField3.setPreferredSize(new Dimension(200, 25));
+        changePassword.add(passwordField3, gbc);
+
+        gbc.gridy = 2;
+        gbc.gridx = 0;
+        JLabel CNPassword = new JLabel("Confirm the New Password:");
+        changePassword.add(CNPassword, gbc);
+
+        gbc.gridx = 1;
+        JTextField confPasswordField = new JTextField();
+        confPasswordField.setPreferredSize(new Dimension(200, 25));
+        changePassword.add(confPasswordField, gbc);
+
+        gbc.gridy = 3;
+        gbc.gridx = 0;
+        JLabel oldPassword = new JLabel("Enter the Old Password:");
+        changePassword.add(oldPassword, gbc);
+
+        gbc.gridx = 1;
+        JPasswordField passwordField = new JPasswordField();
+        passwordField.setPreferredSize(new Dimension(200, 25));
+        changePassword.add(passwordField, gbc);
+
+        gbc.gridy = 4;
+        gbc.gridx = 1;
+        JButton submit = new JButton("Submit");
+        submit.addActionListener(e->{
+            if (
+                    Objects.equals(passwordField.getText(),this.password)
+                            &&
+                            Objects.equals(passwordField3.getText(),confPasswordField.getText())
+            ){
+                setPassword(passwordField3.getText());
+                JOptionPane.showMessageDialog(Main.frame, "the name now is "+passwordField3.getText());
+                Main.frame.getContentPane().removeAll();
+                Owners(true);
+            }else{
+                JOptionPane.showMessageDialog(Main.frame, "somthing seem wrong. Try again.");
+                Main.frame.getContentPane().removeAll();
+                Owners(true);
+                Main.frame.add(change(), BorderLayout.CENTER);
+            }
+        });
+
+        changePassword.add(submit, gbc);
+
+        return changePassword;
+    }
 
     public void setName(String name) {
         this.name = name;
