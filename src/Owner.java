@@ -85,7 +85,12 @@ public class Owner {
             signOutButton.setAlignmentY(Component.CENTER_ALIGNMENT);
             signOutButton.setFocusable(false);
             signOutButton.setMaximumSize(new Dimension(200, 30));
-            signOutButton.addActionListener(e -> Main.signOut());
+            signOutButton.addActionListener(e -> {
+                Main.frame.getContentPane().removeAll();
+                Main.signOut();
+                Main.frame.revalidate();
+                Main.frame.repaint();
+            });
             ownerPanel.add(signOutButton);
 
             ownerPanel.add(Box.createRigidArea(new Dimension(20, 50)));
@@ -958,7 +963,7 @@ public class Owner {
             Main.frame.getContentPane().removeAll();
             Owners(true);
             Main.frame.add(PatSettings(), BorderLayout.WEST);
-            Main.frame.add(viewAllPats(),BorderLayout.CENTER);
+            Main.frame.add(viewAllPats(null),BorderLayout.CENTER);
             Main.frame.revalidate();
             Main.frame.repaint();
         });
@@ -1222,7 +1227,7 @@ public class Owner {
             gbc.gridwidth = 2;
             submitButton.addActionListener(e -> {
                 if (dayField.getText().isEmpty() && monthField.getText().isEmpty() && yearField.getText().isEmpty() &&
-                    docField.getText().isEmpty() && meDiagnosisField.getText().isEmpty() && medicineField.getText().isEmpty() ) {
+                        docField.getText().isEmpty() && meDiagnosisField.getText().isEmpty() && medicineField.getText().isEmpty() ) {
                     Main.frame.getContentPane().removeAll();
                     Owners(true);
                     Main.frame.add(PatSettings(), BorderLayout.WEST);
@@ -1231,12 +1236,12 @@ public class Owner {
 
                 }
                 else if (dayField.getText().isEmpty() || monthField.getText().isEmpty() || yearField.getText().isEmpty() ||
-                            docField.getText().isEmpty() || meDiagnosisField.getText().isEmpty() || medicineField.getText().isEmpty()) {
-                        JOptionPane.showMessageDialog(Main.frame, "somthing seem wrong. Try again.");
-                        Main.frame.getContentPane().removeAll();
-                        Owners(true);
-                        Main.frame.add(PatSettings(), BorderLayout.WEST);
-                        Main.frame.add(addPat(1,patient),BorderLayout.CENTER);
+                        docField.getText().isEmpty() || meDiagnosisField.getText().isEmpty() || medicineField.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(Main.frame, "somthing seem wrong. Try again.");
+                    Main.frame.getContentPane().removeAll();
+                    Owners(true);
+                    Main.frame.add(PatSettings(), BorderLayout.WEST);
+                    Main.frame.add(addPat(1,patient),BorderLayout.CENTER);
                 } else if(patient.getDocFromId(docField.getText())==null){
                     JOptionPane.showMessageDialog(Main.frame, "there's no doctor with "+docField.getText()+ ". Try again.");
                     Main.frame.getContentPane().removeAll();
@@ -1245,16 +1250,25 @@ public class Owner {
                     Main.frame.add(addPat(1,patient),BorderLayout.CENTER);
                 }
                 else {
-
+                    patient.appointment = new MedicalHistory(null,patient.getDocFromId(docField.getText()));
                     patient.appointment.doc = patient.getDocFromId(docField.getText());
                     patient.appointment.medicalDiagnosis = meDiagnosisField.getText();
                     patient.appointment.medicalDiagnosis = medicineField.getText();
-                    patient.appointment.date = MedicalHistory.createAppointment(
-                            String.format("%02d", dayField.getText())+"/"
-                                    +String.format("%02d", monthField.getText())
-                                    +year.getText(),
-                            String.format("%02d",HourField.getText())+":00"
-                    );
+                    try {
+                        int day1 = Integer.parseInt(dayField.getText());
+                        int month1 = Integer.parseInt(monthField.getText());
+                        int year1 = Integer.parseInt(year.getText());
+                        int hour = Integer.parseInt(HourField.getText());
+
+                        String date1 = String.format("%02d/%02d/%04d", day1, month1, year1);
+                        String time = String.format("%02d:00", hour);
+
+                        patient.appointment.date = MedicalHistory.createAppointment(date1, time);
+                    } catch (NumberFormatException c) {
+                        System.out.println("Invalid input: Please enter numeric values for day, month, year, and hour.");
+                    } catch (Exception c) {
+                        System.out.println("An error occurred: " + c.getMessage());
+                    }
                     patient.getDocFromId(docField.getText()).patients.add(patient);
                     patient.getDocFromId(docField.getText()).phoneNumber += 1;
                     Main.frame.getContentPane().removeAll();
@@ -1294,7 +1308,7 @@ public class Owner {
         return panel;
     }
 
-    protected JPanel viewAllPats(){
+    protected JPanel viewAllPats(Doctor doctor){
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -1304,7 +1318,9 @@ public class Owner {
 
         int row = 0, col = 0;
 
-        for (Patient patient : Main.owner.patients) {
+        ArrayList<Patient> patientArrayList = (doctor==null)?patients:doctor.patients;
+
+        for (Patient patient : patientArrayList) {
             JPanel patPanel = new JPanel();
             patPanel.setLayout(new BorderLayout());
             patPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // Optional border

@@ -14,6 +14,11 @@ public class Main {
 
 
     public static void main(String[] args) {
+        Doctor defaultDoctor = new Doctor();
+        defaultDoctor.fullName = "yacin";
+        defaultDoctor.Id = "GM2005268";
+        defaultDoctor.code = "GM2005268";
+        owner.doctors.add(defaultDoctor);
         signOut(); 
     }
 

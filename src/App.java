@@ -1,143 +1,138 @@
+import javax.swing.*;
+import java.awt.*;
 import java.util.Objects;
 
 public class App {
 
-    public void Choose(Owner owner){
-        if (owner.doctors.isEmpty() && owner.patients.isEmpty()){
+    public void Choose(Owner owner) {
+        if (owner.doctors.isEmpty() && owner.patients.isEmpty()) {
             owner.Owners(false);
-        }else {
-            System.out.println("1: owner " +
-                    (owner.doctors.isEmpty()?"": "\n2: doctor") +
-                    (owner.patients.isEmpty()?"": "\n3: Patient"));
-            byte c;
-            do{
-                c = Main.reader.nextByte();
-            }while (c<1 || c>3);
-
-            if(c == 1){
-                owner.Owners(false);
-            } else if (c == 2) {
-                DocUser(null);
-            }else{
-                PatUser(null);
-            }
+        } else {
+            Main.frame.getContentPane().removeAll();
+            Main.frame.getContentPane().add(choose(owner));
+            Main.frame.revalidate();
+            Main.frame.repaint();
         }
     }
 
-    protected void DocUser(Doctor doc){
-        if(doc==null){
-            System.out.println("enter your full name ");
-            String tempName = Main.reader.next();
+    protected JPanel choose(Owner owner) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
 
-            System.out.println("enter your ID");
-            String tempID = Main.reader.next();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
 
-            for (Doctor doctor: Main.owner.doctors){
-                if (doctor.fullName.equals(tempName) && doctor.Id.equals(tempID)){
-                    System.out.println("hi "+doctor.fullName);
-                    if (doctor.code == null){
-                        System.out.println("this is your first time in the System");
-                        doctor.setCode();
-                    }else {
-                        System.out.println("please enter your password");
-                        String tempCode = Main.reader.next();
+        gbc.gridy = 0;
+        JButton admin = new JButton("Admin");
+        admin.addActionListener(e -> owner.Owners(false));
+        panel.add(admin, gbc);
 
-                        if (!doctor.code.equals(tempCode)){
-                            System.out.println("you're wrong");
-                            Main.signOut();
-                        }
+        gbc.gridy = 1;
+        JButton doctor = new JButton("Doctor");
+        doctor.setEnabled(!owner.doctors.isEmpty());
+        doctor.addActionListener(e -> {
+            Main.frame.getContentPane().removeAll();
+            Main.frame.add(DocUser(null,false), BorderLayout.CENTER);
+            Main.frame.revalidate();
+            Main.frame.repaint();
+        });
+        panel.add(doctor, gbc);
 
+        gbc.gridy = 2;
+        JButton patient = new JButton("Patient");
+        patient.setEnabled(!owner.patients.isEmpty());
+        patient.addActionListener(e -> handlePatientClick());
+        panel.add(patient, gbc);
+
+        return panel;
+    }
+
+    // Event Handlers
+    private void handleAdminClick() {
+        JOptionPane.showMessageDialog(Main.frame, "Admin button clicked!");
+    }
+
+    private void handleDoctorClick() {
+        JOptionPane.showMessageDialog(Main.frame, "Doctor button clicked!");
+    }
+
+    private void handlePatientClick() {
+        JOptionPane.showMessageDialog(Main.frame, "Patient button clicked!");
+    }
+
+    protected JPanel DocUser(Doctor doct,boolean t) {
+        final Doctor[] docHolder = {doct}; // Use an array to hold the doc reference
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        if (doct == null) {
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridwidth = 2;
+            JLabel CNTitle = new JLabel("Sign In");
+            CNTitle.setFont(new Font("Arial", Font.BOLD, 16));
+            panel.add(CNTitle, gbc);
+
+            gbc.gridy = 1;
+            gbc.gridwidth = 1;
+            gbc.gridx = 0;
+            JLabel NName = new JLabel("Enter your full Name:");
+            panel.add(NName, gbc);
+
+            gbc.gridx = 1;
+            JTextField nameField = new JTextField();
+            nameField.setPreferredSize(new Dimension(200, 25));
+            panel.add(nameField, gbc);
+
+            gbc.gridy = 2;
+            gbc.gridx = 0;
+            JLabel password = new JLabel("Enter your ID:");
+            panel.add(password, gbc);
+
+            gbc.gridx = 1;
+            JTextField IdField = new JTextField();
+            IdField.setPreferredSize(new Dimension(200, 25));
+            panel.add(IdField, gbc);
+
+            gbc.gridy = 3;
+            gbc.gridx = 1;
+            JButton submit = new JButton("Submit");
+            submit.addActionListener(e -> {
+                boolean doctorFound = false;
+                for (Doctor doctor : Main.owner.doctors) {
+                    if (Objects.equals(IdField.getText(), doctor.Id) &&
+                            Objects.equals(nameField.getText(), doctor.fullName)) {
+                        docHolder[0] = doctor; // Assign to the array
+                        doctorFound = true;
+                        break;
                     }
-
-                    doc = doctor;
-
-                    break;
                 }
-            }
-            if (doc == null){
-                System.out.println("there's no doctor with those information");
-                App app = new App();
-                app.Choose(Main.owner);
-            }
+                if (!doctorFound) {
+                    JOptionPane.showMessageDialog(Main.frame, "Something seems wrong. Try again.");
+                    Main.frame.getContentPane().removeAll();
+                    Main.frame.getContentPane().add(choose(Main.owner));
+                } else {
+                    Main.frame.getContentPane().removeAll();
+                    Main.frame.getContentPane().add(DocUser(docHolder[0],false)); // Use the array value
+                }
+                Main.frame.revalidate();
+                Main.frame.repaint();
+            });
+            panel.add(submit, gbc);
+        } else {
+            JPanel docPanel = doct.user(t);
+            panel.add(docPanel);
         }
-        System.out.println("----------------------------\n");
 
-        System.out.println("0: sign out" +
-                "\n1: see your information" +
-                "\n2: update your password" +
-                "\n3: add a patient" +
-                (doc.patients.isEmpty()?"":"\n4: see all your patients"));
-
-        byte c;
-        do{
-            c = Main.reader.nextByte();
-        }while (c<0 || c>3);
-
-        if(c == 0){
-            Main.signOut();
-        }
-        else if (c == 1) {
-            System.out.println(doc.toString());
-            System.out.println("----------------------");
-            System.out.println("0: sign out" +
-                    "\n1: update your information" +
-                    "\n2: return");
-            byte ch;
-            do{
-                ch = Main.reader.nextByte();
-            }while (ch<0 || ch>2);
-
-            if (ch==0){
-                Main.signOut();
-            }
-            else if (ch==1) {
-                doc.setInfo();
-            }
-            else {
-                DocUser(doc);
-            }
-
-        }
-        else if (c==2) {
-            System.out.println("enter your current password");
-            String tempCode = Main.reader.next();
-
-            if (doc.code.equals(tempCode)){
-                doc.setCode();
-            } else {
-                System.out.println("you're wrong");
-                DocUser(doc);
-            }
-
-        }
-        else if (c==3){
-            Patient tempPat = new Patient();
-            tempPat.setAppointment(null,doc);
-            System.out.println("personal information " + "\nPatient full name");
-            tempPat.fullName = Main.reader.next();
-
-            System.out.println("Patient phone number");
-            do{
-                tempPat.phoneNumber = Main.reader.next();
-            }while (!tempPat.phoneNumber.startsWith("0"));
-
-            System.out.println("Patient age");
- //           do{
- //               tempPat.age = Main.reader.nextByte();
- //           }while (tempPat.age<0);
-
-            tempPat.code = tempPat.fullName + tempPat.age;
-
-            System.out.println("the Patient code is : " + tempPat.code);
-
-            doc.patients.add(tempPat);
-            Main.owner.patients.add(tempPat);
-            System.out.println(tempPat.fullName + " is in the system");
-        }
-        else if (c==4 && !doc.patients.isEmpty()){
-            doc.getPatients();
-        }
+        return panel;
     }
+
 
     protected void PatUser(Patient pat){
         if (pat == null){
@@ -218,5 +213,6 @@ public class App {
 
         }
     }
-
 }
+
+/**/
