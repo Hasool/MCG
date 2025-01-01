@@ -1,27 +1,1 @@
-import java.util.Scanner;
-
-public class Main {
-
-    static Scanner reader = new Scanner(System.in);
-    static Owner owner = new Owner();
-    static Frame frame = new Frame();
-
-
-    static void signOut() {
-        App app = new App();
-        app.Choose(owner);
-    }
-
-
-    public static void main(String[] args) {
-        Doctor defaultDoctor = new Doctor();
-        defaultDoctor.fullName = "yacin";
-        defaultDoctor.Id = "GM2005268";
-        defaultDoctor.code = "GM2005268";
-        owner.doctors.add(defaultDoctor);
-        signOut(); 
-    }
-
-
-
-}
+import java.time.LocalDate;import java.util.Scanner;public class Main {    static Scanner reader = new Scanner(System.in);    static Owner owner = new Owner();    static Frame frame = new Frame();    static void signOut() {        App app = new App();        app.Choose(owner);    }    public static void main(String[] args) {        Doctor defaultDoctor = new Doctor();        defaultDoctor.fullName = "yacin";        defaultDoctor.Id = "GM2005268";        defaultDoctor.code = "GM2005268";        owner.doctors.add(defaultDoctor);        Patient defaultPatient = new Patient();        defaultPatient.fullName = "yacin";        defaultPatient.code = "GM2005268";        defaultPatient.patDoc=defaultDoctor;        defaultPatient.appointment = new MedicalHistory(defaultDoctor);        defaultPatient.appointment.date = new Dmy(3,7,2026);        defaultPatient.futureAppointment.add(defaultPatient.appointment);        MedicalHistory p = new MedicalHistory(defaultDoctor);        p.date = new Dmy(3,7,2012);        defaultPatient.futureAppointment.add(p);        owner.patients.add(defaultPatient);        for (Patient patient : owner.patients) {            patient.futureAppointment.removeIf(fA -> {                if (fA.date.getDmy().isBefore(LocalDate.now())) {                    patient.medicalHistories.add(fA);                    return true;                }                return false;            });        }        signOut();     }}

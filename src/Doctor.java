@@ -1,4 +1,8 @@
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -85,14 +89,6 @@ public class Doctor extends Human{
         return "";
     }
 
-
-
-    public void getPatients() {
-        int i =1;
-        for (Patient patient : patients) {
-            System.out.println(i + ": " + patient.toString());
-        }
-    }
 
     public Boolean IsNotNew(String id , String z3){
         for (Doctor doctor : Main.owner.doctors){
@@ -193,10 +189,10 @@ public class Doctor extends Human{
             gbc.gridx = 1;
             JButton submit = new JButton("Submit");
             submit.addActionListener(e -> {
-                String enteredPassword = passField.getText(); // Get user input
+                String enteredPassword = passField.getText();
                 if (Objects.equals(enteredPassword, this.code)) {
                     Main.frame.getContentPane().removeAll();
-                    docNav(); // Navigate to the doctor's dashboard
+                    docNav();
                 } else {
                     JOptionPane.showMessageDialog(Main.frame, "Invalid password. Please try again.");
                     passField.setText(""); // Clear the password field for re-entry
@@ -296,7 +292,7 @@ public class Doctor extends Human{
         gbc.gridx = 0;
         gbc.gridy = row++;
         gbc.gridwidth = 2;
-        JLabel phoneLabel = new JLabel("Your phone number is "+ this.phoneNumber );
+        JLabel phoneLabel = new JLabel("phone number is "+ this.phoneNumber );
         infoPanel.add(phoneLabel, gbc);
 
         gbc.gridx = 0;
@@ -314,7 +310,7 @@ public class Doctor extends Human{
         gbc.gridx = 0;
         gbc.gridy = row++;
         gbc.gridwidth = 2;
-        JLabel patientsLabel = new JLabel("You have " + this.patientsNumber +" patient" +((this.patientsNumber>1) ? "s" : ""));
+        JLabel patientsLabel = new JLabel("have " + this.patientsNumber +" patient" +((this.patientsNumber>1) ? "s" : ""));
         infoPanel.add(patientsLabel, gbc);
 
         gbc.gridx = 1;
@@ -325,10 +321,78 @@ public class Doctor extends Human{
         Image scaledEditImage = editImage.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         JButton editIcon = new JButton(new ImageIcon(scaledEditImage));
         editIcon.setBackground(new Color(0xFF11FF00, true));
-        editIcon.addActionListener(e -> System.out.println("edit trigger"));
+        editIcon.addActionListener(e -> editDoc());
         infoPanel.add(editIcon, gbc);
 
         return infoPanel;
+    }
+
+    protected void editDoc(){
+        Main.frame.getContentPane().removeAll();
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        JLabel remarqueLabel = new JLabel("<html><b><h4>if the old information is right than leave the field</h4></b></html>");
+        panel.add(remarqueLabel, gbc);
+
+        gbc.gridy=1;
+        gbc.gridwidth = 1;
+        JLabel name = new JLabel("enter the name");
+        panel.add(name,gbc);
+
+        gbc.gridx=1;
+        JTextField fullName = new JTextField(20);
+        panel.add(fullName,gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JLabel phone = new JLabel("enter the phone number");
+        panel.add(phone,gbc);
+
+        gbc.gridx=1;
+        JTextField phoneField = new JTextField(20);
+        panel.add(phoneField,gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        JLabel age = new JLabel("enter the age ");
+        panel.add(age,gbc);
+
+        gbc.gridx=1;
+        JTextField ageField = new JTextField(20);
+        panel.add(ageField,gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        JButton btn = new JButton("submit the changes");
+        btn.addActionListener(e->{
+            if (!fullName.getText().isEmpty()){
+                this.fullName=fullName.getText();
+            }
+            if (!ageField.getText().isEmpty()){
+                this.age=ageField.getText();
+            }
+            if (!phoneField.getText().isEmpty()){
+                this.phoneNumber=phoneField.getText();
+            }
+            Main.frame.getContentPane().removeAll();
+            docNav();
+            Main.frame.add(seeInfo(), BorderLayout.CENTER);
+            Main.frame.revalidate();
+            Main.frame.repaint();
+        });
+        panel.add(btn,gbc);
+
+
+        Main.frame.add(panel, BorderLayout.CENTER);
+        Main.frame.revalidate();
+        Main.frame.repaint();
     }
 
     protected String IdToHtml(String id){
@@ -577,6 +641,7 @@ public class Doctor extends Human{
             panel.add(day, gbc);
 
             JTextField dayField = new JTextField(5);
+            ((AbstractDocument) dayField.getDocument()).setDocumentFilter(new IntegerOnlyFilter());
             gbc.gridx = 1;
             panel.add(dayField, gbc);
 
@@ -586,6 +651,7 @@ public class Doctor extends Human{
             panel.add(month, gbc);
 
             JTextField monthField = new JTextField(5);
+            ((AbstractDocument) monthField.getDocument()).setDocumentFilter(new IntegerOnlyFilter());
             gbc.gridx = 1;
             panel.add(monthField, gbc);
 
@@ -595,21 +661,13 @@ public class Doctor extends Human{
             panel.add(year, gbc);
 
             JTextField yearField = new JTextField(5);
+            ((AbstractDocument) yearField.getDocument()).setDocumentFilter(new IntegerOnlyFilter());
             gbc.gridx = 1;
             panel.add(yearField, gbc);
 
-            JLabel Hour = new JLabel("enter the Hour of the appointment : ");
-            gbc.gridx = 0;
-            gbc.gridy = 5;
-            panel.add(Hour, gbc);
-
-            JTextField HourField = new JTextField(20);
-            gbc.gridx = 1;
-            panel.add(HourField, gbc);
-
             JLabel meDiagnosis = new JLabel("enter the medical Diagnosis : ");
             gbc.gridx = 0;
-            gbc.gridy = 6;
+            gbc.gridy = 5;
             panel.add(meDiagnosis, gbc);
 
             JTextField meDiagnosisField = new JTextField(20);
@@ -618,7 +676,7 @@ public class Doctor extends Human{
 
             JLabel medicine = new JLabel("enter the medicine : ");
             gbc.gridx = 0;
-            gbc.gridy = 7;
+            gbc.gridy = 6;
             panel.add(medicine, gbc);
 
             JTextField medicineField = new JTextField(20);
@@ -627,7 +685,7 @@ public class Doctor extends Human{
 
             JButton submitButton = new JButton("Next");
             gbc.gridx = 1;
-            gbc.gridy =8;
+            gbc.gridy =7;
             gbc.gridwidth = 2;
             submitButton.addActionListener(e->{
                 if (dayField.getText().isEmpty() && monthField.getText().isEmpty() && yearField.getText().isEmpty() &&
@@ -635,7 +693,7 @@ public class Doctor extends Human{
                     Main.frame.getContentPane().removeAll();
                     docNav();
                     Main.frame.add(urPatNav(), BorderLayout.WEST);
-                    Main.frame.add(addPat(2,patient),BorderLayout.CENTER);
+                    Main.frame.add(addPat(2,tempPat),BorderLayout.CENTER);
                 }
                 else if (dayField.getText().isEmpty() || monthField.getText().isEmpty() || yearField.getText().isEmpty() ||
                         meDiagnosisField.getText().isEmpty() || medicineField.getText().isEmpty()){
@@ -646,32 +704,30 @@ public class Doctor extends Human{
                     Main.frame.add(addPat(1,patient),BorderLayout.CENTER);
                 }
                 else {
-                    tempPat.appointment = new MedicalHistory(null,this);
-                    tempPat.appointment.doc = tempPat.getDocFromId(this.Id);
+                    tempPat.appointment = new MedicalHistory(this);
+                    tempPat.appointment.doc = this;
+                    tempPat.patDoc = this;
                     tempPat.appointment.medicalDiagnosis = meDiagnosisField.getText();
                     tempPat.appointment.medicalDiagnosis = medicineField.getText();
                     try {
                         int day1 = Integer.parseInt(dayField.getText());
                         int month1 = Integer.parseInt(monthField.getText());
-                        int year1 = Integer.parseInt(year.getText());
-                        int hour = Integer.parseInt(HourField.getText());
+                        int year1 = Integer.parseInt(yearField.getText());
 
-                        String date1 = String.format("%02d/%02d/%04d", day1, month1, year1);
-                        String time = String.format("%02d:00", hour);
 
-                        tempPat.appointment.date = MedicalHistory.createAppointment(date1, time);
+                        tempPat.appointment.date = new Dmy(day1,month1,year1);
                     } catch (NumberFormatException c) {
                         System.out.println("Invalid input: Please enter numeric values for day, month, year, and hour.");
                     } catch (Exception c) {
                         System.out.println("An error occurred: " + c.getMessage());
                     }
-                    this.patients.add(tempPat);
-                    this.phoneNumber += 1;
                     Main.frame.getContentPane().removeAll();
                     docNav();
                     Main.frame.add(urPatNav(), BorderLayout.WEST);
                     Main.frame.add(addPat(2,tempPat),BorderLayout.CENTER);
                 }
+                Main.frame.revalidate();
+                Main.frame.repaint();
             });
             panel.add(submitButton, gbc);
         }
@@ -687,6 +743,9 @@ public class Doctor extends Human{
             gbc.gridwidth = 2;
             saveButton.addActionListener(e -> {
                 Main.owner.patients.add(patient);
+                patients.add(patient);
+                patient.patDoc=this;
+                this.phoneNumber += 1;
                 Main.frame.getContentPane().removeAll();
                 docNav();
                 Main.frame.add(urPatNav(), BorderLayout.WEST);
@@ -698,6 +757,27 @@ public class Doctor extends Human{
         }
 
         return panel;
+    }
+
+    static class IntegerOnlyFilter extends DocumentFilter {
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            if (string.matches("\\d+")) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String string, AttributeSet attr) throws BadLocationException {
+            if (string.matches("\\d+")) {
+                super.replace(fb, offset, length, string, attr);
+            }
+        }
+
+        @Override
+        public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+            super.remove(fb, offset, length);
+        }
     }
 
 

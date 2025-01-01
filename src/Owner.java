@@ -1,5 +1,6 @@
 
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +11,7 @@ import java.util.Objects;
 public class Owner {
     protected ArrayList<Doctor> doctors ;
     protected ArrayList<Patient> patients ;
+    protected ArrayList<JLabel> requests = new ArrayList<>() ;
     private String password;
     private String name;
 
@@ -78,6 +80,19 @@ public class Owner {
             ownerPanel.add(changeCredentialsButton);
 
             ownerPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+
+            JButton requestsBtn = new JButton("Request");
+            requestsBtn.setEnabled(!requests.isEmpty());
+            requestsBtn.setAlignmentY(Component.CENTER_ALIGNMENT);
+            requestsBtn.setMaximumSize(new Dimension(200, 30));
+            requestsBtn.addActionListener(e -> {
+                Main.frame.getContentPane().removeAll();
+                Owners(true);
+                Main.frame.add(req(), BorderLayout.CENTER);
+                Main.frame.revalidate();
+                Main.frame.repaint();
+            });
+            ownerPanel.add(requestsBtn);
 
             ownerPanel.add(Box.createHorizontalGlue());
 
@@ -150,6 +165,52 @@ public class Owner {
     }
 
 
+
+    protected JScrollPane req() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weightx = 0;
+
+
+        Dimension fixedSize = new Dimension(300, 200);
+
+        for (int i = 0; i < requests.size(); i++) {
+            JLabel label = requests.get(i);
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            label.setVerticalAlignment(SwingConstants.TOP);
+
+            JPanel panelOfReq = new JPanel();
+            panelOfReq.setLayout(new BorderLayout());
+            panelOfReq.setBackground(new Color(0x6E0A1133, true));
+            panelOfReq.setPreferredSize(fixedSize);
+
+            panelOfReq.add(label, BorderLayout.CENTER);
+
+            JButton btn = new JButton("delete");
+            btn.addActionListener(e -> {
+                requests.remove(label);
+                Main.frame.getContentPane().removeAll();
+                Owners(true);
+                Main.frame.add(req(), BorderLayout.CENTER);
+                Main.frame.revalidate();
+                Main.frame.repaint();
+            });
+            panelOfReq.add(btn, BorderLayout.NORTH);
+
+            gbc.gridx = i % 3;
+            gbc.gridy = i / 3;
+            panel.add(panelOfReq, gbc);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        return scrollPane;
+    }
 
 
 
@@ -1250,20 +1311,17 @@ public class Owner {
                     Main.frame.add(addPat(1,patient),BorderLayout.CENTER);
                 }
                 else {
-                    patient.appointment = new MedicalHistory(null,patient.getDocFromId(docField.getText()));
+                    patient.appointment = new MedicalHistory(patient.getDocFromId(docField.getText()));
                     patient.appointment.doc = patient.getDocFromId(docField.getText());
+                    patient.patDoc = patient.getDocFromId(docField.getText());
                     patient.appointment.medicalDiagnosis = meDiagnosisField.getText();
                     patient.appointment.medicalDiagnosis = medicineField.getText();
                     try {
                         int day1 = Integer.parseInt(dayField.getText());
                         int month1 = Integer.parseInt(monthField.getText());
                         int year1 = Integer.parseInt(year.getText());
-                        int hour = Integer.parseInt(HourField.getText());
 
-                        String date1 = String.format("%02d/%02d/%04d", day1, month1, year1);
-                        String time = String.format("%02d:00", hour);
-
-                        patient.appointment.date = MedicalHistory.createAppointment(date1, time);
+                        patient.appointment.date = new Dmy(day1,month1,year1);
                     } catch (NumberFormatException c) {
                         System.out.println("Invalid input: Please enter numeric values for day, month, year, and hour.");
                     } catch (Exception c) {
@@ -1336,7 +1394,11 @@ public class Owner {
             deleteIcon.addActionListener(e -> {
                 Main.owner.patients.remove(patient);
                 Main.frame.getContentPane().removeAll();
-                Owners(true);
+                if (doctor==null){
+                    Owners(true);
+                }else {
+                    doctor.docNav();
+                }
                 Main.frame.add(PatSettings(), BorderLayout.WEST);
                 Main.frame.revalidate();
                 Main.frame.repaint();
@@ -1352,8 +1414,12 @@ public class Owner {
             editIcon.setBackground(new Color(0xFF11FF00, true));
             editIcon.addActionListener(e->{
                 Main.frame.getContentPane().removeAll();
-                Owners(true);
-                Main.frame.add(editPatient(patient), BorderLayout.WEST);
+                if (doctor==null){
+                    Owners(true);
+                }else {
+                    doctor.docNav();
+                }
+                Main.frame.add(editPatient(patient,doctor), BorderLayout.CENTER);
                 Main.frame.revalidate();
                 Main.frame.repaint();
             });
@@ -1449,31 +1515,325 @@ public class Owner {
         return deletePanel;
     }
 
-    protected JPanel editPatient(Patient patient){
+    protected JPanel editPatient(Patient patient,Doctor doctor){
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        JPanel navPanel = new JPanel();
-        navPanel.setLayout(new BoxLayout(navPanel,BoxLayout.PAGE_AXIS));
-        navPanel.setBackground(new Color(0x85B9DE));
+        JPanel navEPat = new JPanel();
+        navEPat.setLayout(new BoxLayout(navEPat, BoxLayout.PAGE_AXIS));
+        navEPat.setBackground(new Color(0x98D1FA));
 
-        navPanel.add(Box.createRigidArea(new Dimension(250, 20)));
+        navEPat.add(Box.createRigidArea(new Dimension(250, 20)));
 
-        JButton editPatientButton = new JButton("Edit Patient");
-        editPatientButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        editPatientButton.setMaximumSize(new Dimension(200, 30));
-        editPatientButton.addActionListener(e -> {
+        JLabel titleLabel = new JLabel("Updating "+patient.fullName);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        navEPat.add(titleLabel);
+
+        navEPat.add(Box.createRigidArea(new Dimension(250, 20)));
+
+        JButton UPI = new JButton("Update the personal information");
+        UPI.setAlignmentX(Component.CENTER_ALIGNMENT);
+        UPI.setMaximumSize(new Dimension(200, 30));
+        UPI.addActionListener(e -> patient.editPat(doctor==null?1:2));
+        navEPat.add(UPI);
+
+        navEPat.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JButton AAp = new JButton("Add an appointment");
+        AAp.setAlignmentX(Component.CENTER_ALIGNMENT);
+        AAp.setMaximumSize(new Dimension(200, 30));
+        AAp.setEnabled(!doctors.isEmpty());
+        AAp.addActionListener(e -> {
             Main.frame.getContentPane().removeAll();
-            Owners(true);
-            Main.frame.add(PatSettings(), BorderLayout.WEST);
-            Main.frame.add(editPatient(patient),BorderLayout.CENTER);
+            if (doctor==null){
+                Owners(true);
+            }else {
+                doctor.docNav();
+            }
+            Main.frame.add(editPatient(patient,doctor), BorderLayout.WEST);
+            Main.frame.add(AApPanel(patient,doctor),BorderLayout.CENTER);
             Main.frame.revalidate();
             Main.frame.repaint();
         });
-        navPanel.add(editPatientButton);
+        navEPat.add(AAp);
+
+        navEPat.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JButton UAp = new JButton("Update the next appointment");
+        UAp.setAlignmentX(Component.CENTER_ALIGNMENT);
+        UAp.setMaximumSize(new Dimension(200, 30));
+        UAp.setEnabled(!doctors.isEmpty());
+        UAp.addActionListener(e -> {
+            Main.frame.getContentPane().removeAll();
+            if (doctor==null){
+                Owners(true);
+            }else {
+                doctor.docNav();
+            }
+            Main.frame.add(editPatient(patient,doctor), BorderLayout.WEST);
+            Main.frame.add(UApPanel(patient),BorderLayout.CENTER);
+            Main.frame.revalidate();
+            Main.frame.repaint();
+        });
+        navEPat.add(UAp);
+
+        navEPat.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JButton DP = new JButton("Delete the patient");
+        DP.setAlignmentX(Component.CENTER_ALIGNMENT);
+        DP.setMaximumSize(new Dimension(200, 30));
+        DP.setEnabled(!doctors.isEmpty());
+        DP.addActionListener(e -> {
+            patients.remove(patient);
+            if (doctor!=null){
+                doctor.patients.remove(patient);
+            }
+            Main.frame.getContentPane().removeAll();
+            if (doctor==null){
+                Owners(true);
+            }else {
+                doctor.docNav();
+            }
+            Main.frame.revalidate();
+            Main.frame.repaint();
+        });
+        navEPat.add(DP);
+
+        navEPat.add(Box.createVerticalGlue());
+
+        JButton backButton = new JButton("Back");
+        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backButton.setMaximumSize(new Dimension(200, 30));
+        backButton.addActionListener(e ->{
+            if (doctor==null){
+                Owners(true);
+            }else {
+                doctor.docNav();
+            }
+        }
+        );
+        navEPat.add(backButton);
+
+        navEPat.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        panel.add(navEPat,BorderLayout.WEST);
 
         return panel;
     }
+
+    protected JPanel AApPanel(Patient patient,Doctor doctor){
+        JPanel panel=new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        JLabel docIdLabel = new JLabel("enter the doctor id : ");
+
+        JTextField docId = new JTextField(20);
+        if (doctor==null){
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            panel.add(docIdLabel, gbc);
+
+            gbc.gridx = 1;
+            panel.add(docId, gbc);
+        }
+
+        JLabel date = new JLabel("enter the Patient date : ");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(date, gbc);
+
+        JLabel day = new JLabel("day : ");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(day, gbc);
+
+        JTextField dayField = new JTextField(5);
+        ((AbstractDocument) dayField.getDocument()).setDocumentFilter(new Doctor.IntegerOnlyFilter());
+        gbc.gridx = 1;
+        panel.add(dayField, gbc);
+
+        JLabel month = new JLabel("month(number) : ");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        panel.add(month, gbc);
+
+        JTextField monthField = new JTextField(5);
+        ((AbstractDocument) monthField.getDocument()).setDocumentFilter(new Doctor.IntegerOnlyFilter());
+        gbc.gridx = 1;
+        panel.add(monthField, gbc);
+
+        JLabel year = new JLabel("year : ");
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        panel.add(year, gbc);
+
+        JTextField yearField = new JTextField(5);
+        ((AbstractDocument) yearField.getDocument()).setDocumentFilter(new Doctor.IntegerOnlyFilter());
+        gbc.gridx = 1;
+        panel.add(yearField, gbc);
+
+        JLabel meDiagnosis = new JLabel("enter the medical Diagnosis : ");
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        panel.add(meDiagnosis, gbc);
+
+        JTextField meDiagnosisField = new JTextField(20);
+        gbc.gridx = 1;
+        panel.add(meDiagnosisField, gbc);
+
+        JLabel medicine = new JLabel("enter the medicine : ");
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        panel.add(medicine, gbc);
+
+        JTextField medicineField = new JTextField(20);
+        gbc.gridx = 1;
+        panel.add(medicineField, gbc);
+
+        JButton submitButton = new JButton("Next");
+        gbc.gridx = 1;
+        gbc.gridy =7;
+        gbc.gridwidth = 2;
+        submitButton.addActionListener(e-> {
+            if (dayField.getText().isEmpty() || monthField.getText().isEmpty() || yearField.getText().isEmpty() ||
+                    meDiagnosisField.getText().isEmpty() || medicineField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(Main.frame, "somthing seem wrong. Try again.");
+                Main.frame.getContentPane().removeAll();
+                if (doctor==null){
+                    Owners(true);
+                }else {
+                    doctor.docNav();
+                }
+                Main.frame.add(editPatient(patient,doctor), BorderLayout.CENTER);
+                Main.frame.revalidate();
+                Main.frame.repaint();
+            } else if(doctor!=null) {
+                patient.appointment = new MedicalHistory(doctor);
+                patient.appointment.doc = doctor;
+                patient.patDoc = doctor;
+                patient.appointment.medicalDiagnosis = meDiagnosisField.getText();
+                patient.appointment.medicalDiagnosis = medicineField.getText();
+                try {
+                    int day1 = Integer.parseInt(dayField.getText());
+                    int month1 = Integer.parseInt(monthField.getText());
+                    int year1 = Integer.parseInt(yearField.getText());
+
+
+                    patient.appointment.date = new Dmy(day1, month1, year1);
+                } catch (NumberFormatException c) {
+                    System.out.println("Invalid input: Please enter numeric values for day, month, year, and hour.");
+                } catch (Exception c) {
+                    System.out.println("An error occurred: " + c.getMessage());
+                }
+                patients.add(patient);
+                doctor.patients.add(patient);
+                doctor.phoneNumber += 1;
+                Main.frame.getContentPane().removeAll();
+                doctor.docNav();
+                Main.frame.add(editPatient(patient,doctor), BorderLayout.CENTER);
+                Main.frame.revalidate();
+                Main.frame.repaint();
+            }else{
+                if (patient.getDocFromId(docId.getText()) == null){
+                    JOptionPane.showMessageDialog(Main.frame, "somthing seem wrong. Try again.");
+                    Main.frame.getContentPane().removeAll();
+                    Owners(true);
+                    Main.frame.add(editPatient(patient,null), BorderLayout.CENTER);
+                    Main.frame.revalidate();
+                    Main.frame.repaint();
+                }
+                MedicalHistory appo = new MedicalHistory( patient.getDocFromId(docId.getText()));
+                appo.medicalDiagnosis = meDiagnosisField.getText();
+                appo.medicalDiagnosis = medicineField.getText();
+                appo.doc = patient.getDocFromId(docId.getText());
+                try {
+                    int day1 = Integer.parseInt(dayField.getText());
+                    int month1 = Integer.parseInt(monthField.getText());
+                    int year1 = Integer.parseInt(yearField.getText());
+
+
+                    appo.date = new Dmy(day1, month1, year1);
+                } catch (NumberFormatException c) {
+                    System.out.println("Invalid input: Please enter numeric values for day, month, year, and hour.");
+                } catch (Exception c) {
+                    System.out.println("An error occurred: " + c.getMessage());
+                }
+                patient.futureAppointment.add(appo);
+                patient.patDoc = patient.getDocFromId(docId.getText());
+
+                patients.add(patient);
+                patient.getDocFromId(docId.getText()).patients.add(patient);
+                patient.getDocFromId(docId.getText()).phoneNumber += 1;
+                Main.frame.getContentPane().removeAll();
+                Owners(true);
+                Main.frame.add(editPatient(patient,null), BorderLayout.CENTER);
+                Main.frame.revalidate();
+                Main.frame.repaint();
+            }
+            Main.frame.revalidate();
+            Main.frame.repaint();
+
+        });
+        panel.add(submitButton,gbc);
+
+        return panel;
+    }
+
+    protected JPanel UApPanel(Patient patient){
+        JPanel panel=new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        JLabel title = new JLabel("Updating the appointment");
+        gbc.gridx=0;
+        gbc.gridy=0;
+        panel.add(title,gbc);
+
+        gbc.gridy=1;
+
+        JLabel day = new JLabel();
+        gbc.gridx=0;
+        panel.add(day);
+        JLabel month = new JLabel();
+        gbc.gridx=1;
+        panel.add(month);
+        JLabel year = new JLabel();
+        gbc.gridx=2;
+        panel.add(year);
+
+        gbc.gridy=2;
+
+        JTextField dayField = new JTextField();
+        gbc.gridx=0;
+        panel.add(dayField);
+        JTextField monthField = new JTextField();
+        gbc.gridx=1;
+        panel.add(monthField);
+        JTextField yearField = new JTextField();
+        gbc.gridx=2;
+        panel.add(yearField);
+
+        JButton submit = new JButton("Submit the changes");
+        submit.addActionListener(e -> {
+            try {
+                int day1 = Integer.parseInt(dayField.getText());
+                int month1 = Integer.parseInt(monthField.getText());
+                int year1 = Integer.parseInt(year.getText());
+
+                patient.appointment.date = new Dmy(day1,month1,year1);
+            } catch (NumberFormatException c) {
+                System.out.println("Invalid input: Please enter numeric values for day, month, year, and hour.");
+            } catch (Exception c) {
+                System.out.println("An error occurred: " + c.getMessage());
+            }
+        });
+
+        return panel;
+    }
+
 
 
 

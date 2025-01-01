@@ -44,27 +44,20 @@ public class App {
         gbc.gridy = 2;
         JButton patient = new JButton("Patient");
         patient.setEnabled(!owner.patients.isEmpty());
-        patient.addActionListener(e -> handlePatientClick());
+        patient.addActionListener(e -> {
+            Main.frame.getContentPane().removeAll();
+            Main.frame.add(patUser(null), BorderLayout.CENTER);
+            Main.frame.revalidate();
+            Main.frame.repaint();
+        });
         panel.add(patient, gbc);
 
         return panel;
     }
 
-    // Event Handlers
-    private void handleAdminClick() {
-        JOptionPane.showMessageDialog(Main.frame, "Admin button clicked!");
-    }
-
-    private void handleDoctorClick() {
-        JOptionPane.showMessageDialog(Main.frame, "Doctor button clicked!");
-    }
-
-    private void handlePatientClick() {
-        JOptionPane.showMessageDialog(Main.frame, "Patient button clicked!");
-    }
 
     protected JPanel DocUser(Doctor doct,boolean t) {
-        final Doctor[] docHolder = {doct}; // Use an array to hold the doc reference
+        final Doctor[] docHolder = {doct};
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -133,86 +126,77 @@ public class App {
         return panel;
     }
 
+    protected JPanel patUser(Patient patient){
+        final Patient[] patHolder = {patient};
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-    protected void PatUser(Patient pat){
-        if (pat == null){
-            System.out.println("enter your full name ");
-            String tempName = Main.reader.next();
+        if (patHolder[0] == null){
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridwidth = 2;
+            JLabel CNTitle = new JLabel("Sign In");
+            CNTitle.setFont(new Font("Arial", Font.BOLD, 16));
+            panel.add(CNTitle, gbc);
 
-            System.out.println("enter your password");
-            String tempCode = Main.reader.next();
+            gbc.gridy = 1;
+            gbc.gridwidth = 1;
+            gbc.gridx = 0;
+            JLabel NName = new JLabel("Enter your full Name:");
+            panel.add(NName, gbc);
 
-            for (Patient patient : Main.owner.patients){
-                if (patient.fullName.equals(tempName) && patient.code.equals(tempCode)) {
-                    System.out.println("hi " + patient.fullName);
-                    pat = patient;
+            gbc.gridx = 1;
+            JTextField nameField = new JTextField();
+            nameField.setPreferredSize(new Dimension(200, 25));
+            panel.add(nameField, gbc);
+
+            gbc.gridy = 2;
+            gbc.gridx = 0;
+            JLabel password = new JLabel("Enter your password:");
+            panel.add(password, gbc);
+
+            gbc.gridx = 1;
+            JTextField PasswordField = new JTextField();
+            PasswordField.setPreferredSize(new Dimension(200, 25));
+            panel.add(PasswordField, gbc);
+
+            gbc.gridy = 3;
+            gbc.gridx = 1;
+            JButton submit = getJButton(nameField, PasswordField, patHolder);
+            panel.add(submit, gbc);
+        } else {
+            patient.user();
+        }
+
+        return panel;
+    }
+
+    private JButton getJButton(JTextField nameField, JTextField PasswordField, Patient[] patHolder) {
+        JButton submit = new JButton("Submit");
+        submit.addActionListener(e -> {
+            boolean patientFound = false;
+            for (Patient patient1 : Main.owner.patients) {
+                if (Objects.equals(nameField.getText(), patient1.fullName) &&
+                        Objects.equals(PasswordField.getText(), patient1.code)) {
+                    patHolder[0] = patient1;
+                    patientFound = true;
                     break;
                 }
             }
-            if (pat == null){
-                System.out.println("there's no doctor with those information");
-                App app = new App();
-                app.Choose(Main.owner);
+            if (!patientFound) {
+                JOptionPane.showMessageDialog(Main.frame, "Something seems wrong. Try again.");
+                Main.frame.getContentPane().removeAll();
+                Main.frame.getContentPane().add(choose(Main.owner));
+            } else {
+                Main.frame.getContentPane().removeAll();
+                Main.frame.getContentPane().add(patUser(patHolder[0]));
             }
-            System.out.println("----------------------------\n");
-
-            System.out.println("0: sign out" +
-                    "\n1: see your information" +
-                    "\n2: update your password" +
-                    "\n3: see your next appointment" +
-                    (pat.medicalHistories.isEmpty()?"":"\n4: see your MedicalHistory"));
-
-            byte c;
-            do{
-                c = Main.reader.nextByte();
-            }while (c<0 || c>3);
-
-            if(c == 0){
-                Main.signOut();
-            }
-            else if (c == 1) {
-                System.out.println(pat.toString());
-                System.out.println("----------------------");
-                System.out.println("0: sign out" +
-                        "\n1: update your information" +
-                        "\n2: return");
-                byte ch;
-                do{
-                    ch = Main.reader.nextByte();
-                }while (ch<0 || ch>2);
-
-                if (ch==0){
-                    Main.signOut();
-                }
-                else if (ch==1) {
-                    pat.setInfo();
-                }
-                else {
-                    PatUser(pat);
-                }
-
-            }
-            else if (c==2) {
-                System.out.println("enter your current password");
-                String tempCode1 = Main.reader.next();
-
-                if (pat.code.equals(tempCode1)){
-                    pat.setCode();
-                } else {
-                    System.out.println("you're wrong");
-                    PatUser(pat);
-                }
-
-            }
-            else if (c==3){
-                System.out.println(pat.getAppointment());
-            }
-            else if (c==4 && !pat.medicalHistories.isEmpty()){
-                pat.getAppointment();
-            }
-
-        }
+            Main.frame.revalidate();
+            Main.frame.repaint();
+        });
+        return submit;
     }
 }
-
-/**/
