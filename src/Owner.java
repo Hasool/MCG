@@ -1,9 +1,13 @@
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -387,189 +391,179 @@ public class Owner {
 
     }
 
-    protected JPanel stageForme(JPanel PI,JPanel PrI,JPanel SI,Doctor doctor) {
-        Doctor tempDoc = doctor==null?new Doctor():doctor;
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+    protected JPanel stageForme(JPanel PI, JPanel PrI, JPanel SI, Doctor doctor) {
+        Doctor tempDoc = doctor == null ? new Doctor() : doctor;
+        JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        if (Objects.equals(PI.getBackground(), new Color(0x82DBEF))){
-            JLabel FName = new JLabel("enter the doctor full name");
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            panel.add(FName, gbc);
-
-            JTextField FNameField = new JTextField(15);
-            gbc.gridx = 1;
-            panel.add(FNameField, gbc);
-
-
-
-            JLabel age = new JLabel("enter the doctor age : ");
-            gbc.gridx = 0;
-            gbc.gridy = 1;
-            panel.add(age, gbc);
-
-            JTextField ageField = new JTextField(15);
-            gbc.gridx = 1;
-            panel.add(ageField, gbc);
-
-
-            JLabel PNumber = new JLabel("enter the doctor phone number : ");
-            gbc.gridx = 0;
-            gbc.gridy = 2;
-            panel.add(PNumber, gbc);
-
-            JTextField PNumberField = new JTextField(15);
-            gbc.gridx = 1;
-            panel.add(PNumberField, gbc);
-
-
-            JButton submitButton = new JButton("Next");
-            gbc.gridx = 4;
-            gbc.gridy = 4;
-            gbc.gridwidth = 2;
-            submitButton.addActionListener(e -> {
-                if (FNameField.getText().isEmpty() || ageField.getText().isEmpty() || PNumberField.getText().isEmpty()){
-                    JOptionPane.showMessageDialog(Main.frame, "somthing seem wrong. Try again.");
-                    Main.frame.getContentPane().removeAll();
-                    Owners(true);
-                    Main.frame.add(DocSettings(), BorderLayout.WEST);
-                    Main.frame.add(addDoc(0,null),BorderLayout.CENTER);
-                }else {
-                    tempDoc.fullName = FNameField.getText();
-                    tempDoc.age = ageField.getText();
-                    tempDoc.phoneNumber = PNumberField.getText();
-                    Main.frame.getContentPane().removeAll();
-                    Owners(true);
-                    Main.frame.add(DocSettings(), BorderLayout.WEST);
-                    Main.frame.add(addDoc(1,tempDoc),BorderLayout.CENTER);
-                }
-                Main.frame.revalidate();
-                Main.frame.repaint();
-
-            });
-
-            panel.add(submitButton, gbc);
+        if (Objects.equals(PI.getBackground(), new Color(0x82DBEF))) {
+            addPersonalInfoForm(panel, gbc, tempDoc);
+        } else if (Objects.equals(PrI.getBackground(), new Color(0x82DBEF))) {
+            addProfessionalInfoForm(panel, gbc, tempDoc);
+        } else {
+            addSummaryForm(panel, gbc, tempDoc);
         }
-        else if (Objects.equals(PrI.getBackground(), new Color(0x82DBEF))) {
-            String[] buttonLabels = {
-                    "General Medicine", "Cardiology", "Pediatrics",
-                    "Obstetrics and Gynecology", "General Surgery",
-                    "Ophthalmology", "Neurology", "Dermatology and Cosmetology",
-                    "Pulmonology", "Otolaryngology", "Nephrology and Urology",
-                    "Oncology", "Dentistry", "Psychiatry", "Rheumatology"
-            };
-
-            String[] specialties = {
-                    "GM", "C0", "P0",
-                    "OG", "GS", "O0",
-                    "N0", "DC", "P1",
-                    "O1", "NU", "O2",
-                    "D0", "P2", "R0"
-            };
-
-            JFrame frame = new JFrame("Medical Specialties");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(600, 300);
-
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new GridLayout(0, 3)); // Set the layout to a 3-column grid
-
-            final JButton[] lastClickedButton = {null};
-            final String[] z1 = new String[1];
-
-            for (int i = 0; i < buttonLabels.length; i++) {
-                String buttonText = buttonLabels[i];
-                String specialtyCode = specialties[i];
-
-                JButton button = new JButton(buttonText);
-
-                button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        z1[0] =specialtyCode;
-
-                        if (lastClickedButton[0] != null) {
-                            lastClickedButton[0].setEnabled(true);
-                        }
-
-                        button.setEnabled(false);
-                        lastClickedButton[0] = button;
-                    }
-                });
-
-                buttonPanel.add(button);
-            }
-
-            JScrollPane scrollPane = new JScrollPane(buttonPanel);
-            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-            panel.add(scrollPane);
-
-            JLabel enterYear = new JLabel("Enter the year of employment : ");
-            gbc.gridx = 0;
-            gbc.gridy = 2;
-            panel.add(enterYear, gbc);
-
-            JTextField enterYearField = new JTextField(15);
-            gbc.gridx = 1;
-            panel.add(enterYearField, gbc);
-
-            JButton submitButton = new JButton("Next");
-            gbc.gridx = 4;
-            gbc.gridy = 4;
-            gbc.gridwidth = 2;
-            submitButton.addActionListener(e -> {
-
-                if (enterYearField.getText().length()!=4){
-                    JOptionPane.showMessageDialog(Main.frame, "Enter a valid year. Try again.");
-                    Main.frame.getContentPane().removeAll();
-                    Owners(true);
-                    Main.frame.add(DocSettings(), BorderLayout.WEST);
-                    Main.frame.add(addDoc(1,doctor),BorderLayout.CENTER);
-                    Main.frame.revalidate();
-                    Main.frame.repaint();
-                }else {
-                    doctor.setId(z1[0],enterYearField.getText());
-                    Main.frame.getContentPane().removeAll();
-                    Owners(true);
-                    Main.frame.add(DocSettings(), BorderLayout.WEST);
-                    Main.frame.add(addDoc(2,doctor),BorderLayout.CENTER);
-                    Main.frame.revalidate();
-                    Main.frame.repaint();
-                }
-
-            });
-
-            panel.add(submitButton, gbc);
-        }
-        else {
-            JLabel FName = new JLabel(doctor.toString());
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            panel.add(FName, gbc);
-
-            JButton saveButton = new JButton("Next");
-            gbc.gridx = 4;
-            gbc.gridy = 4;
-            gbc.gridwidth = 2;
-            saveButton.addActionListener(e -> {
-                Main.owner.doctors.add(doctor);
-                Main.frame.getContentPane().removeAll();
-                Owners(true);
-                Main.frame.add(DocSettings(), BorderLayout.WEST);
-                Main.frame.revalidate();
-                Main.frame.repaint();
-            });
-
-            panel.add(saveButton, gbc);
-        }
-
 
         return panel;
     }
+
+    private void addPersonalInfoForm(JPanel panel, GridBagConstraints gbc, Doctor doctor) {
+        JLabel FNameLabel = new JLabel("Enter the doctor's full name:");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(FNameLabel, gbc);
+
+        JTextField FNameField = new JTextField(15);
+        gbc.gridx = 1;
+        panel.add(FNameField, gbc);
+
+        JLabel ageLabel = new JLabel("Enter the doctor's age:");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(ageLabel, gbc);
+
+        JTextField ageField = new JTextField(15);
+        addNumericKeyListener(ageField); // Restrict to numbers
+        gbc.gridx = 1;
+        panel.add(ageField, gbc);
+
+        JLabel PNumberLabel = new JLabel("Enter the doctor's phone number:");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(PNumberLabel, gbc);
+
+        JTextField PNumberField = new JTextField(15);
+        addNumericKeyListener(PNumberField); // Restrict to numbers
+        gbc.gridx = 1;
+        panel.add(PNumberField, gbc);
+
+        JButton submitButton = new JButton("Next");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        submitButton.addActionListener(e -> {
+            if (FNameField.getText().isEmpty() || ageField.getText().isEmpty() || PNumberField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(Main.frame, "Something seems wrong. Please try again.");
+            } else {
+                doctor.fullName = FNameField.getText();
+                doctor.age = ageField.getText();
+                doctor.phoneNumber = PNumberField.getText();
+                updateUI(1, doctor);
+            }
+        });
+        panel.add(submitButton, gbc);
+    }
+
+    private void addProfessionalInfoForm(JPanel panel, GridBagConstraints gbc, Doctor doctor) {
+        String[] buttonLabels = {
+                "General Medicine", "Cardiology", "Pediatrics",
+                "Obstetrics and Gynecology", "General Surgery",
+                "Ophthalmology", "Neurology", "Dermatology and Cosmetology",
+                "Pulmonology", "Otolaryngology", "Nephrology and Urology",
+                "Oncology", "Dentistry", "Psychiatry", "Rheumatology"
+        };
+
+        String[] specialties = {
+                "GM", "C0", "P0",
+                "OG", "GS", "O0",
+                "N0", "DC", "P1",
+                "O1", "NU", "O2",
+                "D0", "P2", "R0"
+        };
+
+        JPanel buttonPanel = new JPanel(new GridLayout(0, 3));
+        final JButton[] lastClickedButton = {null};
+        final String[] selectedSpecialty = new String[1];
+
+        for (int i = 0; i < buttonLabels.length; i++) {
+            JButton button = new JButton(buttonLabels[i]);
+            String specialtyCode = specialties[i];
+
+            button.addActionListener(e -> {
+                selectedSpecialty[0] = specialtyCode;
+                if (lastClickedButton[0] != null) {
+                    lastClickedButton[0].setEnabled(true);
+                }
+                button.setEnabled(false);
+                lastClickedButton[0] = button;
+            });
+
+            buttonPanel.add(button);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(buttonPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        panel.add(scrollPane, gbc);
+
+        JLabel enterYearLabel = new JLabel("Enter the year of employment:");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        panel.add(enterYearLabel, gbc);
+
+        JTextField enterYearField = new JTextField(15);
+        addNumericKeyListener(enterYearField); // Restrict to numbers
+        gbc.gridx = 1;
+        panel.add(enterYearField, gbc);
+
+        JButton submitButton = new JButton("Next");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        submitButton.addActionListener(e -> {
+            if (enterYearField.getText().length() != 4) {
+                JOptionPane.showMessageDialog(Main.frame, "Enter a valid year. Try again.");
+            } else {
+                doctor.setId(selectedSpecialty[0], enterYearField.getText());
+                updateUI(2, doctor);
+            }
+        });
+        panel.add(submitButton, gbc);
+    }
+
+    private void addSummaryForm(JPanel panel, GridBagConstraints gbc, Doctor doctor) {
+        JLabel summaryLabel = new JLabel(doctor.toString());
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(summaryLabel, gbc);
+
+        JButton saveButton = new JButton("Save");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        saveButton.addActionListener(e -> {
+            Main.owner.doctors.add(doctor);
+            updateUI(0, null);
+        });
+        panel.add(saveButton, gbc);
+    }
+
+    private void updateUI(int stage, Doctor doctor) {
+        Main.frame.getContentPane().removeAll();
+        Owners(true);
+        Main.frame.add(DocSettings(), BorderLayout.WEST);
+        Main.frame.add(addDoc(stage, doctor), BorderLayout.CENTER);
+        Main.frame.revalidate();
+        Main.frame.repaint();
+    }
+
+    // Helper method to add a KeyListener for numeric input
+    private void addNumericKeyListener(JTextField textField) {
+        textField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c)) {
+                    e.consume(); // Ignore non-digit input
+                }
+            }
+        });
+    }
+
 
     //hna tkhlas add doctor
 
@@ -809,6 +803,7 @@ public class Owner {
             panel.add(age, gbc);
 
             JTextField ageField = new JTextField(15);
+            addNumericKeyListener(ageField);
             gbc.gridx = 1;
             panel.add(ageField, gbc);
 
@@ -819,6 +814,7 @@ public class Owner {
             panel.add(PNumber, gbc);
 
             JTextField PNumberField = new JTextField(15);
+            addNumericKeyListener(PNumberField);
             gbc.gridx = 1;
             panel.add(PNumberField, gbc);
 
@@ -1140,6 +1136,7 @@ public class Owner {
             panel.add(age, gbc);
 
             JTextField ageField = new JTextField(15);
+            addNumericKeyListener(ageField);
             gbc.gridx = 1;
             panel.add(ageField, gbc);
 
@@ -1150,6 +1147,7 @@ public class Owner {
             panel.add(PNumber, gbc);
 
             JTextField PNumberField = new JTextField(15);
+            addNumericKeyListener(PNumberField);
             gbc.gridx = 1;
             panel.add(PNumberField, gbc);
 
@@ -1211,6 +1209,7 @@ public class Owner {
             panel.add(day, gbc);
 
             JTextField dayField = new JTextField(5);
+            addNumericKeyListener(dayField);
             gbc.gridx = 1;
             panel.add(dayField, gbc);
 
@@ -1220,6 +1219,7 @@ public class Owner {
             panel.add(month, gbc);
 
             JTextField monthField = new JTextField(5);
+            addNumericKeyListener(monthField);
             gbc.gridx = 1;
             panel.add(monthField, gbc);
 
@@ -1229,17 +1229,9 @@ public class Owner {
             panel.add(year, gbc);
 
             JTextField yearField = new JTextField(5);
+            addNumericKeyListener(yearField);
             gbc.gridx = 1;
             panel.add(yearField, gbc);
-
-            JLabel Hour = new JLabel("enter the Hour of the appointment : ");
-            gbc.gridx = 0;
-            gbc.gridy = 5;
-            panel.add(Hour, gbc);
-
-            JTextField HourField = new JTextField(20);
-            gbc.gridx = 1;
-            panel.add(HourField, gbc);
 
             JLabel doc = new JLabel("enter the doctor id : ");
             gbc.gridx = 0;
@@ -1250,7 +1242,7 @@ public class Owner {
             gbc.gridx = 1;
             panel.add(docField, gbc);
 
-            JLabel meDiagnosis = new JLabel("enter the medical Diagnosis : ");
+            JLabel meDiagnosis = new JLabel("enter the medical Diagnosis (let it empty if you want to): ");
             gbc.gridx = 0;
             gbc.gridy = 7;
             panel.add(meDiagnosis, gbc);
@@ -1259,7 +1251,7 @@ public class Owner {
             gbc.gridx = 1;
             panel.add(meDiagnosisField, gbc);
 
-            JLabel medicine = new JLabel("enter the medicine : ");
+            JLabel medicine = new JLabel("enter the medicine (let it empty if you want to): ");
             gbc.gridx = 0;
             gbc.gridy = 8;
             panel.add(medicine, gbc);
@@ -1274,7 +1266,7 @@ public class Owner {
             gbc.gridwidth = 2;
             submitButton.addActionListener(e -> {
                 if (dayField.getText().isEmpty() && monthField.getText().isEmpty() && yearField.getText().isEmpty() &&
-                        docField.getText().isEmpty() && meDiagnosisField.getText().isEmpty() && medicineField.getText().isEmpty() ) {
+                        docField.getText().isEmpty()) {
                     Main.frame.getContentPane().removeAll();
                     Owners(true);
                     Main.frame.add(PatSettings(), BorderLayout.WEST);
@@ -1283,7 +1275,7 @@ public class Owner {
 
                 }
                 else if (dayField.getText().isEmpty() || monthField.getText().isEmpty() || yearField.getText().isEmpty() ||
-                        docField.getText().isEmpty() || meDiagnosisField.getText().isEmpty() || medicineField.getText().isEmpty()) {
+                        docField.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(Main.frame, "somthing seem wrong. Try again.");
                     Main.frame.getContentPane().removeAll();
                     Owners(true);
@@ -1300,8 +1292,8 @@ public class Owner {
                     patient.appointment = new MedicalHistory(patient.getDocFromId(docField.getText()));
                     patient.appointment.doc = patient.getDocFromId(docField.getText());
                     patient.patDoc = patient.getDocFromId(docField.getText());
-                    patient.appointment.medicalDiagnosis = meDiagnosisField.getText();
-                    patient.appointment.medicalDiagnosis = medicineField.getText();
+                    patient.appointment.medicalDiagnosis = meDiagnosisField.getText().isEmpty()?"":meDiagnosisField.getText();
+                    patient.appointment.medicine = medicineField.getText().isEmpty()?"":medicineField.getText();
                     try {
                         int day1 = Integer.parseInt(dayField.getText());
                         int month1 = Integer.parseInt(monthField.getText());
