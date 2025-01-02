@@ -395,7 +395,7 @@ public class Doctor extends Human{
         Main.frame.repaint();
     }
 
-    protected String IdToHtml(String id){
+    protected String IdToHtml(String id) {
         String[] Specialties = {
                 "General Medicine", "Cardiology", "Pediatrics",
                 "Obstetrics and Gynecology", "General Surgery",
@@ -412,10 +412,10 @@ public class Doctor extends Human{
                 "D0", "P2", "R0"
         };
 
-
         for (int i = 0; i < 15; i++) {
-            if(id.startsWith(specialties[i])){
-                return "<html> a <h2>"+Specialties[i] + "</h2><br> begin his employment in <h2>" + id.substring(2,6)+"</h2><br><html>";
+            if (id.startsWith(specialties[i])) {
+                return "<html><b>Specialty:</b> <h2 style='color: #2E86C1;'>" + Specialties[i] + "</h2>" +
+                        "<b>Employment Start:</b> <h2 style='color: #2E86C1;'>" + id.substring(2, 6) + "</h2></html>";
             }
         }
         return "";

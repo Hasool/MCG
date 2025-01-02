@@ -21,8 +21,8 @@ public class MedicalHistory {
     @Override
     public String toString() {
         return (
-                "<html>the appointment is in "+date.toString()+
-                "\n with dr."+doc.fullName+"<html>"
+                "<html> the appointment is in "+date.toString()+
+                "\n with dr."+doc.fullName+" <html>"
                 );
     }
 

@@ -1777,7 +1777,7 @@ public class Owner {
 
     protected JPanel viewAllAppo(Patient patient,Doctor doctor){
         JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBackground(Main.mainBg); // Updated main panel background
+        mainPanel.setBackground(Main.mainBg.brighter()); // Updated main panel background
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.NONE;
