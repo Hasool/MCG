@@ -28,7 +28,7 @@ public class Patient extends Human {
         Main.frame.repaint();
     }
 
-    private JPanel createPatientPanel() {
+    JPanel createPatientPanel() {
         JPanel patPanel = new JPanel();
         patPanel.setLayout(new BoxLayout(patPanel, BoxLayout.X_AXIS));
         patPanel.setBackground(Main.mainBg);
