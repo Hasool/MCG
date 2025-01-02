@@ -15,13 +15,6 @@ public class Patient extends Human{
 
 
     public void user() {
-        futureAppointment.removeIf(fA -> {
-            if (fA.date.getDmy().isBefore(LocalDate.now())) {
-                medicalHistories.add(fA);
-                return true;
-            }
-            return false;
-        });
 
         appointment = findNextAppointment(futureAppointment);
         Main.frame.getContentPane().removeAll();
@@ -519,7 +512,7 @@ public class Patient extends Human{
     }
 
 
-    protected Doctor getDocFromId(String id ){
+    public static Doctor getDocFromId(String id){
         for (Doctor doctor : Main.owner.doctors){
             if (Objects.equals(doctor.Id,id)){
                 return doctor;
