@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.Objects;
 
 public class App {
@@ -16,49 +17,62 @@ public class App {
     }
 
     protected JPanel choose(Owner owner) {
+        ImageBackgroundPanel jPanel = new ImageBackgroundPanel("resources/bg.png");
+        jPanel.setLayout(new BorderLayout());
+
         JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.setBackground(Main.secondBtn.darker());
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(Box.createVerticalGlue());
 
-        gbc.gridy = 0;
-        JButton admin = new JButton("Admin");
-        admin.addActionListener(e -> owner.Owners(false));
-        panel.add(admin, gbc);
+        JButton admin = createCenteredButton("Admin", e -> owner.Owners(false));
+        panel.add(admin);
 
-        gbc.gridy = 1;
-        JButton doctor = new JButton("Doctor");
-        doctor.setEnabled(!owner.doctors.isEmpty());
-        doctor.addActionListener(e -> {
+        panel.add(Box.createRigidArea(new Dimension(0, 50)));
+
+        JButton doctor = createCenteredButton("Doctor", e -> {
             Main.frame.getContentPane().removeAll();
-            Main.frame.add(DocUser(null,false), BorderLayout.CENTER);
+            Main.frame.add(DocUser(null, false), BorderLayout.CENTER);
             Main.frame.revalidate();
             Main.frame.repaint();
         });
-        panel.add(doctor, gbc);
+        doctor.setEnabled(!owner.doctors.isEmpty());
+        panel.add(doctor);
 
-        gbc.gridy = 2;
-        JButton patient = new JButton("Patient");
-        patient.setEnabled(!owner.patients.isEmpty());
-        patient.addActionListener(e -> {
+        panel.add(Box.createRigidArea(new Dimension(400, 50)));
+
+        JButton patient = createCenteredButton("Patient", e -> {
             Main.frame.getContentPane().removeAll();
             Main.frame.add(patUser(null), BorderLayout.CENTER);
             Main.frame.revalidate();
             Main.frame.repaint();
         });
-        panel.add(patient, gbc);
+        patient.setEnabled(!owner.patients.isEmpty());
+        panel.add(patient);
 
-        return panel;
+        panel.add(Box.createVerticalGlue());
+
+
+        jPanel.add(panel, BorderLayout.WEST);
+
+        return jPanel;
+    }
+
+    private JButton createCenteredButton(String text, ActionListener action) {
+        JButton button = new JButton(text);
+        button.setBackground(Main.mainBtn);
+        button.setMaximumSize(new Dimension(200, 30));
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.addActionListener(action);
+        return button;
     }
 
 
     protected JPanel DocUser(Doctor doct,boolean t) {
         final Doctor[] docHolder = {doct};
         JPanel panel = new JPanel();
+        panel.setBackground(Main.mainBg);
         panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -70,12 +84,14 @@ public class App {
             gbc.gridwidth = 2;
             JLabel CNTitle = new JLabel("Sign In");
             CNTitle.setFont(new Font("Arial", Font.BOLD, 16));
+            CNTitle.setForeground(Main.mainBtn.darker());
             panel.add(CNTitle, gbc);
 
             gbc.gridy = 1;
             gbc.gridwidth = 1;
             gbc.gridx = 0;
             JLabel NName = new JLabel("Enter your full Name:");
+            NName.setForeground(Main.mainBtn);
             panel.add(NName, gbc);
 
             gbc.gridx = 1;
@@ -86,6 +102,7 @@ public class App {
             gbc.gridy = 2;
             gbc.gridx = 0;
             JLabel password = new JLabel("Enter your ID:");
+            password.setForeground(Main.mainBtn);
             panel.add(password, gbc);
 
             gbc.gridx = 1;
@@ -96,6 +113,7 @@ public class App {
             gbc.gridy = 3;
             gbc.gridx = 1;
             JButton submit = new JButton("Submit");
+            submit.setBackground(Main.mainBtn);
             submit.addActionListener(e -> {
                 boolean doctorFound = false;
                 for (Doctor doctor : Main.owner.doctors) {
@@ -118,7 +136,8 @@ public class App {
                 Main.frame.repaint();
             });
             panel.add(submit, gbc);
-        } else {
+        }
+        else {
             JPanel docPanel = doct.user(t);
             panel.add(docPanel);
         }
@@ -129,6 +148,7 @@ public class App {
     protected JPanel patUser(Patient patient){
         final Patient[] patHolder = {patient};
         JPanel panel = new JPanel();
+        panel.setBackground(Main.mainBg);
         panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -139,6 +159,7 @@ public class App {
             gbc.gridy = 0;
             gbc.gridwidth = 2;
             JLabel CNTitle = new JLabel("Sign In");
+            CNTitle.setForeground(Main.mainBtn.darker());
             CNTitle.setFont(new Font("Arial", Font.BOLD, 16));
             panel.add(CNTitle, gbc);
 
@@ -146,6 +167,7 @@ public class App {
             gbc.gridwidth = 1;
             gbc.gridx = 0;
             JLabel NName = new JLabel("Enter your full Name:");
+            NName.setForeground(Main.mainBtn);
             panel.add(NName, gbc);
 
             gbc.gridx = 1;
@@ -156,6 +178,7 @@ public class App {
             gbc.gridy = 2;
             gbc.gridx = 0;
             JLabel password = new JLabel("Enter your password:");
+            password.setForeground(Main.mainBtn);
             panel.add(password, gbc);
 
             gbc.gridx = 1;
@@ -166,6 +189,7 @@ public class App {
             gbc.gridy = 3;
             gbc.gridx = 1;
             JButton submit = getJButton(nameField, PasswordField, patHolder);
+            submit.setBackground(Main.mainBtn);
             panel.add(submit, gbc);
         } else {
             patient.user();

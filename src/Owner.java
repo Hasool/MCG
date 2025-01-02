@@ -200,7 +200,7 @@ public class Owner {
 
             JPanel panelOfReq = new JPanel();
             panelOfReq.setLayout(new BorderLayout());
-            panelOfReq.setBackground(new Color(0xFF959EEE, true));
+            panelOfReq.setBackground(Main.secondBg);
             panelOfReq.setPreferredSize(fixedSize);
 
             panelOfReq.add(label, BorderLayout.CENTER);
@@ -586,11 +586,11 @@ public class Owner {
 
         for (Doctor doctor : Main.owner.doctors) {
             JPanel docPanel = new JPanel();
-            docPanel.setBackground(new Color(0xFF959EEE, true));
+            docPanel.setBackground(Main.secondBg);
             docPanel.setLayout(new BorderLayout());
 
             JPanel navPanel = new JPanel();
-            navPanel.setBackground(new Color(0xFF959EEE, true));
+            navPanel.setBackground(Main.secondBg);
             navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.X_AXIS));
             navPanel.add(Box.createRigidArea(new Dimension(10, 30)));
 
@@ -1367,11 +1367,11 @@ public class Owner {
 
         for (Patient patient : patientArrayList) {
             JPanel patPanel = new JPanel();
-            patPanel.setBackground(new Color(0xFF959EEE, true)); // Consistent panel background
+            patPanel.setBackground(Main.secondBg); // Consistent panel background
             patPanel.setLayout(new BorderLayout());
 
             JPanel navPanel = new JPanel();
-            navPanel.setBackground(new Color(0xFF959EEE, true)); // Consistent nav panel background
+            navPanel.setBackground(Main.secondBg); // Consistent nav panel background
             navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.X_AXIS));
             navPanel.add(Box.createRigidArea(new Dimension(10, 30)));
 
@@ -1788,11 +1788,11 @@ public class Owner {
 
         for (MedicalHistory medicalHistory : patient.futureAppointment) {
             JPanel appoPanel = new JPanel();
-            appoPanel.setBackground(new Color(0xFF959EEE, true));
+            appoPanel.setBackground(Main.secondBg);
             appoPanel.setLayout(new BorderLayout());
 
             JPanel navPanel = new JPanel();
-            navPanel.setBackground(new Color(0xFF959EEE, true));
+            navPanel.setBackground(Main.secondBg);
             navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.X_AXIS));
             navPanel.add(Box.createRigidArea(new Dimension(10, 30)));
 
@@ -1986,6 +1986,7 @@ public class Owner {
 
     public JPanel change() {
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setBackground(Main.mainBg);
         splitPane.setTopComponent(changeName());
         splitPane.setBottomComponent(changePassword());
         splitPane.setDividerSize(2);
@@ -1999,6 +2000,7 @@ public class Owner {
 
     protected JPanel changeName() {
         JPanel changeName = new JPanel();
+        changeName.setBackground(Main.mainBg);
         changeName.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -2008,6 +2010,7 @@ public class Owner {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JLabel CNTitle = new JLabel("Change the Name");
+        CNTitle.setForeground(Main.mainBtn.darker());
         CNTitle.setFont(new Font("Arial", Font.BOLD, 16));
         changeName.add(CNTitle, gbc);
 
@@ -2015,6 +2018,7 @@ public class Owner {
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         JLabel NName = new JLabel("Enter the New Name:");
+        NName.setForeground(Main.mainBtn);
         changeName.add(NName, gbc);
 
         gbc.gridx = 1;
@@ -2025,6 +2029,7 @@ public class Owner {
         gbc.gridy = 2;
         gbc.gridx = 0;
         JLabel CNName = new JLabel("Confirm the New Name:");
+        CNName.setForeground(Main.mainBtn);
         changeName.add(CNName, gbc);
 
         gbc.gridx = 1;
@@ -2035,6 +2040,7 @@ public class Owner {
         gbc.gridy = 3;
         gbc.gridx = 0;
         JLabel password = new JLabel("Enter the Password:");
+        password.setForeground(Main.mainBtn);
         changeName.add(password, gbc);
 
         gbc.gridx = 1;
@@ -2045,6 +2051,7 @@ public class Owner {
         gbc.gridy = 4;
         gbc.gridx = 1;
         JButton submit = new JButton("Submit");
+        submit.setBackground(Main.mainBtn);
         submit.addActionListener(e->{
             if (
                     Objects.equals(passwordField.getText(),this.password)
@@ -2070,6 +2077,7 @@ public class Owner {
 
     protected JPanel changePassword() {
         JPanel changePassword = new JPanel();
+        changePassword.setBackground(Main.mainBg);
         changePassword.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -2079,6 +2087,7 @@ public class Owner {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JLabel CPTitle = new JLabel("Change the Password");
+        CPTitle.setForeground(Main.mainBtn.darker());
         CPTitle.setFont(new Font("Arial", Font.BOLD, 16));
         changePassword.add(CPTitle, gbc);
 
@@ -2086,6 +2095,7 @@ public class Owner {
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         JLabel NPassword = new JLabel("Enter the New Password:");
+        NPassword.setForeground(Main.mainBtn);
         changePassword.add(NPassword, gbc);
 
         gbc.gridx = 1;
@@ -2096,6 +2106,7 @@ public class Owner {
         gbc.gridy = 2;
         gbc.gridx = 0;
         JLabel CNPassword = new JLabel("Confirm the New Password:");
+        CNPassword.setForeground(Main.mainBtn);
         changePassword.add(CNPassword, gbc);
 
         gbc.gridx = 1;
@@ -2106,6 +2117,8 @@ public class Owner {
         gbc.gridy = 3;
         gbc.gridx = 0;
         JLabel oldPassword = new JLabel("Enter the Old Password:");
+        oldPassword.setForeground(Main.mainBtn);
+        oldPassword.setBackground(Main.mainBtn);
         changePassword.add(oldPassword, gbc);
 
         gbc.gridx = 1;
@@ -2116,6 +2129,7 @@ public class Owner {
         gbc.gridy = 4;
         gbc.gridx = 1;
         JButton submit = new JButton("Submit");
+        submit.setBackground(Main.mainBtn);
         submit.addActionListener(e->{
             if (
                     Objects.equals(passwordField.getText(),this.password)

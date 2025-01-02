@@ -14,3 +14,4 @@ public class Frame extends JFrame {
         this.setLayout(new BorderLayout());
     }
 }
+

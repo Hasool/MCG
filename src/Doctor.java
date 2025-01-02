@@ -4,6 +4,9 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
@@ -14,29 +17,6 @@ public class Doctor extends Human{
     protected ArrayList<Patient> patients = new ArrayList<>();
     protected int patientsNumber = 0;
 
-
-
-    public void setPatients(){
-        System.out.println("0: sign out" +
-                "\n1: select a patient" +
-                "\n2: return");
-
-        byte c;
-        do{
-            c = Main.reader.nextByte();
-        }while (c<0 || c>2);
-
-        if (c==0)Main.signOut();
-        else if (c==1) {
-            System.out.println("enter the patient index");
-            int i ;
-            do{
-                i = Main.reader.nextInt();
-            }while (i-1<0 || i>patients.size());
-            setPatient(patients.get(i-1));
-        }
-
-    }
 
 
     public void setId(String z1 , String z2) {
@@ -89,7 +69,6 @@ public class Doctor extends Human{
         return "";
     }
 
-
     public Boolean IsNotNew(String id , String z3){
         for (Doctor doctor : Main.owner.doctors){
             if (doctor.Id.equals(id+z3)){
@@ -97,11 +76,6 @@ public class Doctor extends Human{
             }
         }
         return false;
-
-    }
-
-
-    public void setPatient(Patient patient) {
 
     }
 
@@ -113,81 +87,91 @@ public class Doctor extends Human{
         Main.frame.repaint();
     }
 
-
     public void setCode(String code) {
 
         this.code = code;
     }
 
-    public JPanel user(boolean t){
-        JPanel userPanel= new JPanel();
-        userPanel.setLayout(new GridBagLayout());
+
+
+
+
+    public JPanel user(boolean t) {
+        JPanel userPanel = new JPanel(new GridBagLayout());
+        userPanel.setBackground(Main.mainBg); // Set background color
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(10, 10, 10, 10); // Add padding
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        if (this.code==null || t){
+
+        if (this.code == null || t) {
+            // Create Password Section
             gbc.gridx = 0;
             gbc.gridy = 0;
             gbc.gridwidth = 2;
-            JLabel CNTitle = new JLabel("Create a password");
-            CNTitle.setFont(new Font("Arial", Font.BOLD, 16));
+            JLabel CNTitle = new JLabel("<html><b><h2 style='color: #30B2AD;'>Create a Password</h2></b></html>");
             userPanel.add(CNTitle, gbc);
 
             gbc.gridy = 1;
             gbc.gridwidth = 1;
             gbc.gridx = 0;
-            JLabel CPassword = new JLabel("enter a password:");
+            JLabel CPassword = new JLabel("<html><b>Enter a password:</b></html>");
             userPanel.add(CPassword, gbc);
 
             gbc.gridx = 1;
-            JTextField passwordField = new JTextField();
-            passwordField.setPreferredSize(new Dimension(200, 25));
+            JTextField passwordField = new JTextField(20);
+            passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
             userPanel.add(passwordField, gbc);
 
             gbc.gridy = 2;
             gbc.gridx = 0;
-            JLabel password = new JLabel("Confirm the password");
+            JLabel password = new JLabel("<html><b>Confirm the password:</b></html>");
             userPanel.add(password, gbc);
 
             gbc.gridx = 1;
-            JTextField passField = new JTextField();
-            passField.setPreferredSize(new Dimension(200, 25));
+            JTextField passField = new JTextField(20);
+            passField.setFont(new Font("Arial", Font.PLAIN, 14));
             userPanel.add(passField, gbc);
 
             gbc.gridy = 3;
             gbc.gridx = 1;
             JButton submit = new JButton("Submit");
-            submit.addActionListener(e->{
-                if (Objects.equals(passField.getText(),passwordField.getText())){
+            submit.setBackground(new Color(0xFF11FF00, true)); // Green background
+            submit.setForeground(Color.WHITE); // White text
+            submit.setFocusPainted(false); // Remove focus border
+            submit.addActionListener(e -> {
+                if (Objects.equals(passField.getText(), passwordField.getText())) {
                     setCode(passwordField.getText());
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(Main.frame, "Something seems wrong. Try again.");
                 }
                 Return(false);
             });
-            userPanel.add(submit);
-        }else{
+            userPanel.add(submit, gbc);
+        } else {
+            // Login Section
             gbc.gridx = 0;
             gbc.gridy = 0;
             gbc.gridwidth = 2;
-            JLabel CNTitle = new JLabel("Hello " + this.fullName);
-            CNTitle.setFont(new Font("Arial", Font.BOLD, 16));
+            JLabel CNTitle = new JLabel("<html><b><h2 style='color: #30B2AD;'>Hello " + this.fullName + "</h2></b></html>");
             userPanel.add(CNTitle, gbc);
 
             gbc.gridy = 1;
             gbc.gridwidth = 1;
             gbc.gridx = 0;
-            JLabel password = new JLabel("Enter your password:");
+            JLabel password = new JLabel("<html><b>Enter your password:</b></html>");
             userPanel.add(password, gbc);
 
             gbc.gridx = 1;
-            JTextField passField = new JTextField();
-            passField.setPreferredSize(new Dimension(200, 25));
+            JTextField passField = new JTextField(20);
+            passField.setFont(new Font("Arial", Font.PLAIN, 14));
             userPanel.add(passField, gbc);
 
             gbc.gridy = 2;
             gbc.gridx = 1;
             JButton submit = new JButton("Submit");
+            submit.setBackground(new Color(0xFF11FF00, true)); // Green background
+            submit.setForeground(Color.WHITE); // White text
+            submit.setFocusPainted(false); // Remove focus border
             submit.addActionListener(e -> {
                 String enteredPassword = passField.getText();
                 if (Objects.equals(enteredPassword, this.code)) {
@@ -198,29 +182,26 @@ public class Doctor extends Human{
                     passField.setText(""); // Clear the password field for re-entry
                 }
             });
-            userPanel.add(submit,gbc);
+            userPanel.add(submit, gbc);
         }
 
         return userPanel;
     }
 
-    protected void docNav(){
+    protected void docNav() {
         JPanel docPanel = new JPanel();
         docPanel.setLayout(new BoxLayout(docPanel, BoxLayout.X_AXIS));
-        docPanel.setBackground(new Color(0x98D1FA));
+        docPanel.setBackground(Main.mainBg); // Set background color
+        docPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
 
-        docPanel.add(Box.createRigidArea(new Dimension(10, 50)));
-
-        JLabel welcomeLabel = new JLabel("Welcome, "+this.fullName+"!");
+        JLabel welcomeLabel = new JLabel("<html><b><h2 style='color: #30B2AD;'>Welcome, " + this.fullName + "!</h2></b></html>");
         welcomeLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
         docPanel.add(welcomeLabel);
 
-        docPanel.add(Box.createRigidArea(new Dimension(50, 50)));
+        docPanel.add(Box.createRigidArea(new Dimension(20, 0))); // Spacing
 
-        JButton doctorSettingsButton = new JButton("see your information");
-        doctorSettingsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        doctorSettingsButton.setMaximumSize(new Dimension(200, 30));
-        doctorSettingsButton.addActionListener(e-> {
+        // See Your Information Button
+        JButton doctorSettingsButton = createNavButton("See Your Information", e -> {
             Main.frame.getContentPane().removeAll();
             docNav();
             Main.frame.add(seeInfo(), BorderLayout.CENTER);
@@ -229,22 +210,18 @@ public class Doctor extends Human{
         });
         docPanel.add(doctorSettingsButton);
 
-        docPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+        docPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Spacing
 
-        JButton patientSettingsButton = new JButton("update your password");
-        patientSettingsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        patientSettingsButton.setMaximumSize(new Dimension(200, 30));
-        patientSettingsButton.addActionListener(e -> {
+        // Update Your Password Button
+        JButton patientSettingsButton = createNavButton("Update Your Password", e -> {
             Return(true);
         });
         docPanel.add(patientSettingsButton);
 
-        docPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+        docPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Spacing
 
-        JButton changeCredentialsButton = new JButton("your patients");
-        changeCredentialsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        changeCredentialsButton.setMaximumSize(new Dimension(200, 30));
-        changeCredentialsButton.addActionListener(e -> {
+        // Your Patients Button
+        JButton changeCredentialsButton = createNavButton("Your Patients", e -> {
             Main.frame.getContentPane().removeAll();
             docNav();
             Main.frame.add(urPatNav(), BorderLayout.WEST);
@@ -253,66 +230,71 @@ public class Doctor extends Human{
         });
         docPanel.add(changeCredentialsButton);
 
-        docPanel.add(Box.createRigidArea(new Dimension(30, 0)));
+        docPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 
-        docPanel.add(Box.createHorizontalGlue());
+        docPanel.add(Box.createHorizontalGlue()); // Push buttons to the left
 
-        JButton signOutButton = new JButton("Sign Out");
-        signOutButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-        signOutButton.setFocusable(false);
-        signOutButton.setMaximumSize(new Dimension(200, 30));
-        signOutButton.addActionListener(e -> {
+        // Sign Out Button
+        JButton signOutButton = createNavButton("Sign Out", e -> {
             Main.frame.getContentPane().removeAll();
             Main.signOut();
             Main.frame.revalidate();
             Main.frame.repaint();
         });
+        signOutButton.setBackground(new Color(0xFF615D));
         docPanel.add(signOutButton);
 
-        docPanel.add(Box.createRigidArea(new Dimension(20, 50)));
+        // Add the panel to the frame
         Main.frame.getContentPane().add(docPanel, BorderLayout.NORTH);
         Main.frame.revalidate();
         Main.frame.repaint();
     }
 
+
     protected JPanel seeInfo() {
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new GridBagLayout());
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        infoPanel.setBackground(Main.mainBg.brighter()); // Set background color
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(10, 10, 10, 10); // Add padding
         gbc.fill = GridBagConstraints.HORIZONTAL;
         int row = 0;
 
+        // Full Name
         gbc.gridx = 0;
         gbc.gridy = row++;
         gbc.gridwidth = 2;
-        JLabel fullNameLabel = new JLabel("<html><b><h1>" + this.fullName + "</h1></b></html>");
+        JLabel fullNameLabel = new JLabel("<html><b><h1 style='color: #30B2AD;'>" + this.fullName + "</h1></b></html>");
         infoPanel.add(fullNameLabel, gbc);
 
+        // Phone Number
         gbc.gridx = 0;
         gbc.gridy = row++;
         gbc.gridwidth = 2;
-        JLabel phoneLabel = new JLabel("phone number is "+ this.phoneNumber );
+        JLabel phoneLabel = new JLabel("<html><b>Phone:</b> " + this.phoneNumber + "</html>");
         infoPanel.add(phoneLabel, gbc);
 
+        // Age
         gbc.gridx = 0;
         gbc.gridy = row++;
         gbc.gridwidth = 2;
-        JLabel ageLabel = new JLabel("<html><h2>" + this.age + " years old</h2></html>");
+        JLabel ageLabel = new JLabel("<html><b>Age:</b> " + this.age + " years old</html>");
         infoPanel.add(ageLabel, gbc);
 
+        // ID and Specialties
         gbc.gridx = 0;
         gbc.gridy = row++;
         gbc.gridwidth = 2;
         JLabel idLabel = new JLabel(IdToHtml(this.Id));
         infoPanel.add(idLabel, gbc);
 
+        // Number of Patients
         gbc.gridx = 0;
         gbc.gridy = row++;
         gbc.gridwidth = 2;
-        JLabel patientsLabel = new JLabel("have " + this.patientsNumber +" patient" +((this.patientsNumber>1) ? "s" : ""));
+        JLabel patientsLabel = new JLabel("<html><b>Patients:</b> " + this.patientsNumber + " patient" + (this.patientsNumber > 1 ? "s" : "") + "</html>");
         infoPanel.add(patientsLabel, gbc);
 
+        // Edit Button
         gbc.gridx = 1;
         gbc.gridy = row;
         gbc.gridwidth = 1;
@@ -320,76 +302,112 @@ public class Doctor extends Human{
         ImageIcon editImage = new ImageIcon("resources/edit.png");
         Image scaledEditImage = editImage.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         JButton editIcon = new JButton(new ImageIcon(scaledEditImage));
-        editIcon.setBackground(new Color(0xFF11FF00, true));
+        editIcon.setBackground(new Color(0xFF11FF00, true)); // Green background
+        editIcon.setFocusPainted(false); // Remove focus border
+        editIcon.setToolTipText("Edit Profile"); // Add tooltip
         editIcon.addActionListener(e -> editDoc());
         infoPanel.add(editIcon, gbc);
 
         return infoPanel;
     }
 
-    protected void editDoc(){
+    protected void editDoc() {
         Main.frame.getContentPane().removeAll();
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(Main.mainBg.brighter()); // Set background color
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(10, 10, 10, 10); // Add padding
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Instruction Label
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        JLabel remarqueLabel = new JLabel("<html><b><h4>if the old information is right than leave the field</h4></b></html>");
+        JLabel remarqueLabel = new JLabel("<html><b><h3 style='color: #30B2AD;'>If the old information is correct, leave the field empty.</h3></b></html>");
         panel.add(remarqueLabel, gbc);
 
-        gbc.gridy=1;
+        // Full Name Field
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.gridwidth = 1;
-        JLabel name = new JLabel("enter the name");
-        panel.add(name,gbc);
-
-        gbc.gridx=1;
-        JTextField fullName = new JTextField(20);
-        panel.add(fullName,gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        JLabel phone = new JLabel("enter the phone number");
-        panel.add(phone,gbc);
-
-        gbc.gridx=1;
-        JTextField phoneField = new JTextField(20);
-        panel.add(phoneField,gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        JLabel age = new JLabel("enter the age ");
-        panel.add(age,gbc);
-
-        gbc.gridx=1;
-        JTextField ageField = new JTextField(20);
-        panel.add(ageField,gbc);
+        JLabel nameLabel = new JLabel("<html><b>Enter the name:</b></html>");
+        panel.add(nameLabel, gbc);
 
         gbc.gridx = 1;
+        JTextField fullNameField = new JTextField(20);
+        fullNameField.setFont(new Font("Arial", Font.PLAIN, 14));
+        panel.add(fullNameField, gbc);
+
+        // Phone Number Field
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JLabel phoneLabel = new JLabel("<html><b>Enter the phone number:</b></html>");
+        panel.add(phoneLabel, gbc);
+
+        gbc.gridx = 1;
+        JTextField phoneField = new JTextField(20);
+        phoneField.setFont(new Font("Arial", Font.PLAIN, 14));
+        phoneField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c)) {
+                    e.consume(); // Ignore non-digit input
+                }
+            }
+        });
+        panel.add(phoneField, gbc);
+
+        // Age Field (with input validation)
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        JLabel ageLabel = new JLabel("<html><b>Enter the age:</b></html>");
+        panel.add(ageLabel, gbc);
+
+        gbc.gridx = 1;
+        JTextField ageField = new JTextField(20);
+        ageField.setFont(new Font("Arial", Font.PLAIN, 14));
+        // Input validation: Allow only numbers
+        ageField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c)) {
+                    e.consume(); // Ignore non-digit input
+                }
+            }
+        });
+        panel.add(ageField, gbc);
+
+        // Submit Button
+        gbc.gridx = 1;
         gbc.gridy = 4;
-        JButton btn = new JButton("submit the changes");
-        btn.addActionListener(e->{
-            if (!fullName.getText().isEmpty()){
-                this.fullName=fullName.getText();
+        JButton submitButton = new JButton("Submit Changes");
+        submitButton.setBackground(new Color(0xFF11FF00, true)); // Green background
+        submitButton.setForeground(Color.WHITE); // White text
+        submitButton.setFocusPainted(false); // Remove focus border
+        submitButton.addActionListener(e -> {
+            // Update fields if they are not empty
+            if (!fullNameField.getText().isEmpty()) {
+                this.fullName = fullNameField.getText();
             }
-            if (!ageField.getText().isEmpty()){
-                this.age=ageField.getText();
+            if (!phoneField.getText().isEmpty()) {
+                this.phoneNumber = phoneField.getText();
             }
-            if (!phoneField.getText().isEmpty()){
-                this.phoneNumber=phoneField.getText();
+            if (!ageField.getText().isEmpty()) {
+                this.age = ageField.getText();
             }
+
+            // Refresh the UI
             Main.frame.getContentPane().removeAll();
             docNav();
             Main.frame.add(seeInfo(), BorderLayout.CENTER);
             Main.frame.revalidate();
             Main.frame.repaint();
         });
-        panel.add(btn,gbc);
+        panel.add(submitButton, gbc);
 
-
+        // Add the panel to the frame
         Main.frame.add(panel, BorderLayout.CENTER);
         Main.frame.revalidate();
         Main.frame.repaint();
@@ -421,135 +439,137 @@ public class Doctor extends Human{
         return "";
     }
 
-    protected JPanel urPatNav(){
+    protected JPanel urPatNav() {
         JPanel yourPatSet = new JPanel();
         yourPatSet.setLayout(new BoxLayout(yourPatSet, BoxLayout.PAGE_AXIS));
-        yourPatSet.setBackground(new Color(0x98D1FA));
+        yourPatSet.setBackground(Main.mainBg);
+        yourPatSet.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add padding
 
-        yourPatSet.add(Box.createRigidArea(new Dimension(250, 20)));
-
-        JLabel titleLabel = new JLabel("your patient Settings");
+        JLabel titleLabel = new JLabel("<html><b><h2 style='color: #30B2AD;'>Your Patient Settings</h2></b></html>");
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         yourPatSet.add(titleLabel);
 
-        yourPatSet.add(Box.createRigidArea(new Dimension(250, 20)));
+        yourPatSet.add(Box.createRigidArea(new Dimension(0, 20))); // Spacing
 
-        JButton addPatientButton = new JButton("Add Patient");
-        addPatientButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        addPatientButton.setMaximumSize(new Dimension(200, 30));
-        addPatientButton.addActionListener(e -> {
+        // Add Patient Button
+        JButton addPatientButton = createNavButton("Add Patient", e -> {
             Main.frame.getContentPane().removeAll();
             docNav();
             Main.frame.add(urPatNav(), BorderLayout.WEST);
-            Main.frame.getContentPane().add(addPat( 0,null),BorderLayout.CENTER);
+            Main.frame.getContentPane().add(addPat(0, null), BorderLayout.CENTER);
             Main.frame.revalidate();
             Main.frame.repaint();
         });
         yourPatSet.add(addPatientButton);
 
-        yourPatSet.add(Box.createRigidArea(new Dimension(0, 20)));
+        yourPatSet.add(Box.createRigidArea(new Dimension(0, 20))); // Spacing
 
-        JButton viewPatientsButton = new JButton("View All Doctors");
-        viewPatientsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        viewPatientsButton.setMaximumSize(new Dimension(200, 30));
-        viewPatientsButton.setEnabled(!patients.isEmpty());
-        viewPatientsButton.addActionListener(e -> {
+        // View All Patients Button
+        JButton viewPatientsButton = createNavButton("View All Patients", e -> {
             Main.frame.getContentPane().removeAll();
             docNav();
             Main.frame.add(urPatNav(), BorderLayout.WEST);
-            Main.frame.getContentPane().add(Main.owner.viewAllPats(this),BorderLayout.CENTER);
+            Main.frame.getContentPane().add(Main.owner.viewAllPats(this), BorderLayout.CENTER);
             Main.frame.revalidate();
             Main.frame.repaint();
         });
+        viewPatientsButton.setEnabled(!patients.isEmpty()); // Disable if no patients
         yourPatSet.add(viewPatientsButton);
 
-        yourPatSet.add(Box.createVerticalGlue());
+        yourPatSet.add(Box.createVerticalGlue()); // Push buttons to the top
 
-        JButton backButton = new JButton("Back");
-        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        backButton.setMaximumSize(new Dimension(200, 30));
-        backButton.addActionListener(e -> urPatNav());
+        JButton backButton = createNavButton("Back", e -> urPatNav());
+        backButton.setBackground(Main.signOut_back);
         yourPatSet.add(backButton);
 
-        yourPatSet.add(Box.createRigidArea(new Dimension(0, 20)));
+        yourPatSet.add(Box.createRigidArea(new Dimension(0, 20))); // Spacing
 
         return yourPatSet;
     }
 
-    protected JPanel addPat(int i , Patient patient){
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+    // Helper method to create consistent navigation buttons
+    private JButton createNavButton(String text, ActionListener action) {
+        JButton button = new JButton(text);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setMaximumSize(new Dimension(200, 30));
+        button.setBackground(Main.mainBtn); // Light blue color
+        button.setForeground(Color.WHITE); // White text
+        button.setFocusPainted(false); // Remove focus border
+        button.setFont(new Font("Arial", Font.BOLD, 12)); // Consistent font
+        button.addActionListener(action);
+        return button;
+    }
 
-        Color ended = new Color(0x53BA61);
-        Color current = new Color(0x82DBEF);
-        Color next = new Color(0xFF0000);
+    protected JPanel addPat(int i, Patient patient) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Main.mainBg); // Set background color
 
+        // Define colors for stages
+        Color ended = new Color(0x53BA61); // Green for completed stages
+        Color current = new Color(0x82DBEF); // Blue for the current stage
+        Color next = new Color(0xFF0000); // Red for upcoming stages
 
+        // Stages Panel
         JPanel stages = new JPanel();
-        stages.setBackground(next);
         stages.setLayout(new BoxLayout(stages, BoxLayout.PAGE_AXIS));
+        stages.setBackground(next);
+        stages.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
 
-
-        JPanel personalInformation = new JPanel();
-        personalInformation.setLayout(new BoxLayout(personalInformation, BoxLayout.X_AXIS));
-        personalInformation.setPreferredSize(new Dimension(200,50));
-        personalInformation.setMaximumSize(new Dimension(200, 50));
-        personalInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
-        personalInformation.setBackground(i==0?current:ended);
-
-        JLabel PI = new JLabel("   Personal Information");
-        ImageIcon PIImage = new ImageIcon("resources/businessman.png");
-        Image scaledPIImage = PIImage.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        ImageIcon PIImageIcon = new ImageIcon(scaledPIImage);
-        JLabel PIIcon = new JLabel(PIImageIcon);
-        personalInformation.add(PI);
-        personalInformation.add(PIIcon);
-
+        // Personal Information Stage
+        JPanel personalInformation = createStagePanel(
+                "Personal Information", "resources/businessman.png", i == 0 ? current : ended
+        );
         stages.add(personalInformation);
 
-        JPanel medicalInformation = new JPanel();
-        medicalInformation.setLayout(new BoxLayout(medicalInformation, BoxLayout.X_AXIS));
-        medicalInformation.setPreferredSize(new Dimension(200,50));
-        medicalInformation.setMaximumSize(new Dimension(200, 50));
-        medicalInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
-        medicalInformation.setBackground(i==1?current:(i==2?ended:next));
-
-        JLabel MI = new JLabel("   medical Information");
-        ImageIcon MIImage = new ImageIcon("resources/medical.png");
-        Image scaledMIImage = MIImage.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        ImageIcon MIImageIcon = new ImageIcon(scaledMIImage);
-        JLabel MIIcon = new JLabel(MIImageIcon);
-        medicalInformation.add(MI);
-        medicalInformation.add(MIIcon);
+        // Medical Information Stage
+        JPanel medicalInformation = createStagePanel(
+                "Medical Information", "resources/medical.png", i == 1 ? current : (i == 2 ? ended : next)
+        );
         stages.add(medicalInformation);
 
-        JPanel saveInformation = new JPanel();
-        saveInformation.setLayout(new BoxLayout(saveInformation , BoxLayout.X_AXIS));
-        saveInformation.setPreferredSize(new Dimension(200,50));
-        saveInformation.setMaximumSize(new Dimension(200, 50));
-        saveInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
-        saveInformation.setBackground(i==2?current:next);
-
-        JLabel SI = new JLabel("   save Information");
-        ImageIcon SIImage = new ImageIcon("resources/bookmark.png");
-        Image scaledSIImage = SIImage.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-        ImageIcon SIImageIcon = new ImageIcon(scaledSIImage);
-        JLabel SIIcon = new JLabel(SIImageIcon);
-        SIIcon.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        saveInformation.add(SI);
-        saveInformation.add(SIIcon);
+        // Save Information Stage
+        JPanel saveInformation = createStagePanel(
+                "Save Information", "resources/bookmark.png", i == 2 ? current : next
+        );
         stages.add(saveInformation);
 
-        panel.add(stages,BorderLayout.WEST);
-        panel.add(patStageForme(personalInformation,medicalInformation,saveInformation,patient),BorderLayout.CENTER);
+        // Add stages to the left side of the panel
+        panel.add(stages, BorderLayout.WEST);
+
+        // Add the form for the current stage to the center of the panel
+        panel.add(patStageForme(personalInformation, medicalInformation, saveInformation, patient), BorderLayout.CENTER);
 
         return panel;
+    }
+
+    // Helper method to create consistent stage panels
+    private JPanel createStagePanel(String title, String iconPath, Color backgroundColor) {
+        JPanel stagePanel = new JPanel();
+        stagePanel.setLayout(new BoxLayout(stagePanel, BoxLayout.X_AXIS));
+        stagePanel.setPreferredSize(new Dimension(200, 50));
+        stagePanel.setMaximumSize(new Dimension(200, 50));
+        stagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        stagePanel.setBackground(backgroundColor);
+        stagePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // Add padding
+
+        // Add title
+        JLabel titleLabel = new JLabel("   " + title);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 12));
+        stagePanel.add(titleLabel);
+
+        // Add icon
+        ImageIcon icon = new ImageIcon(iconPath);
+        Image scaledIcon = icon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        JLabel iconLabel = new JLabel(new ImageIcon(scaledIcon));
+        stagePanel.add(iconLabel);
+
+        return stagePanel;
     }
 
     protected JPanel patStageForme(JPanel PI,JPanel MI,JPanel SI,Patient patient){
         Patient tempPat = patient==null?new Patient():patient;
         JPanel panel = new JPanel();
+        panel.setBackground(Main.mainBg.brighter());
         panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);

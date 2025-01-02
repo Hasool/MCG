@@ -205,7 +205,7 @@ public class Patient extends Human{
 
             // Create a panel for each medical history
             JPanel panelOfReq = new JPanel(new BorderLayout());
-            panelOfReq.setBackground(new Color(0xFF959EEE, true)); // Light purple background
+            panelOfReq.setBackground(Main.secondBg); // Light purple background
             panelOfReq.setPreferredSize(fixedSize);
             panelOfReq.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1)); // Add a border
             panelOfReq.add(label, BorderLayout.CENTER);
@@ -244,7 +244,7 @@ public class Patient extends Human{
 
             JPanel panelOfReq = new JPanel();
             panelOfReq.setLayout(new BorderLayout());
-            panelOfReq.setBackground(new Color(0xFF959EEE, true));
+            panelOfReq.setBackground(Main.secondBg);
             panelOfReq.setPreferredSize(fixedSize);
 
             panelOfReq.add(label, BorderLayout.CENTER);
@@ -287,7 +287,7 @@ public class Patient extends Human{
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        JLabel fullNameLabel = new JLabel("<html><b><h1 style='color: #2E86C1;'>" + doctor.fullName + "</h1></b></html>");
+        JLabel fullNameLabel = new JLabel("<html><b><h1 style='color: #30B2AD;'>" + doctor.fullName + "</h1></b></html>");
         infoPanel.add(fullNameLabel, gbc);
 
         // Phone Number
@@ -349,14 +349,17 @@ public class Patient extends Human{
         gbc.gridwidth = 1;
 
         JLabel dayLabel = new JLabel("Day:");
+        dayLabel.setForeground(Main.mainBtn);
         gbc.gridx = 0;
         changingPanel.add(dayLabel, gbc);
 
         JLabel monthLabel = new JLabel("Month:");
+        monthLabel.setForeground(Main.mainBtn);
         gbc.gridx = 1;
         changingPanel.add(monthLabel, gbc);
 
         JLabel yearLabel = new JLabel("Year:");
+        yearLabel.setForeground(Main.mainBtn);
         gbc.gridx = 2;
         changingPanel.add(yearLabel, gbc);
 
@@ -381,6 +384,7 @@ public class Patient extends Human{
         gbc.gridwidth = 3;
 
         JButton submit = new JButton("Submit Changes");
+        submit.setBackground(Main.mainBtn);
         submit.addActionListener(e -> {
             try {
                 int day = Integer.parseInt(dayField.getText());
@@ -421,7 +425,7 @@ public class Patient extends Human{
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        JLabel fullNameLabel = new JLabel("<html><b><h1 style='color: #2E86C1;'>" + this.fullName + "</h1></b></html>");
+        JLabel fullNameLabel = new JLabel("<html><b><h1 style='color: #30B2AD;'>" + this.fullName + "</h1></b></html>");
         infoPanel.add(fullNameLabel, gbc);
 
         // Phone Number
@@ -466,7 +470,7 @@ public class Patient extends Human{
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        JLabel remarqueLabel = new JLabel("<html><b><h3 style='color: #2E86C1;'>If the old information is correct, leave the field empty.</h3></b></html>");
+        JLabel remarqueLabel = new JLabel("<html><b><h3 style='color: #30B2AD;'>If the old information is correct, leave the field empty.</h3></b></html>");
         panel.add(remarqueLabel, gbc);
 
         // Full Name Field
