@@ -72,6 +72,18 @@ public class Doctor extends Human {
         return false;
     }
 
+    private void addNumericKeyListener(JTextField textField) {
+        textField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c)) {
+                    e.consume(); // Ignore non-digit input
+                }
+            }
+        });
+    }
+
     public void Return(boolean t) {
         App app = new App();
         Main.frame.getContentPane().removeAll();
@@ -127,7 +139,7 @@ public class Doctor extends Human {
             submit.setForeground(Color.WHITE);
             submit.setFocusPainted(false);
             submit.addActionListener(e -> {
-                if (Objects.equals(passField.getText(), passwordField.getText())) {
+                if ((!passField.getText().isEmpty()) && Objects.equals(passField.getText(), passwordField.getText())) {
                     setCode(passwordField.getText());
                 } else {
                     JOptionPane.showMessageDialog(Main.frame, "Something seems wrong. Try again.");
@@ -541,6 +553,7 @@ public class Doctor extends Human {
             panel.add(age, gbc);
 
             JTextField ageField = new JTextField(15);
+            addNumericKeyListener(ageField);
             gbc.gridx = 1;
             panel.add(ageField, gbc);
 
@@ -550,6 +563,7 @@ public class Doctor extends Human {
             panel.add(PNumber, gbc);
 
             JTextField PNumberField = new JTextField(15);
+            addNumericKeyListener(PNumberField);
             gbc.gridx = 1;
             panel.add(PNumberField, gbc);
 
@@ -630,37 +644,18 @@ public class Doctor extends Human {
             gbc.gridx = 1;
             panel.add(yearField, gbc);
 
-            JLabel meDiagnosis = new JLabel("enter the medical Diagnosis : ");
-            gbc.gridx = 0;
-            gbc.gridy = 5;
-            panel.add(meDiagnosis, gbc);
-
-            JTextField meDiagnosisField = new JTextField(20);
-            gbc.gridx = 1;
-            panel.add(meDiagnosisField, gbc);
-
-            JLabel medicine = new JLabel("enter the medicine : ");
-            gbc.gridx = 0;
-            gbc.gridy = 6;
-            panel.add(medicine, gbc);
-
-            JTextField medicineField = new JTextField(20);
-            gbc.gridx = 1;
-            panel.add(medicineField, gbc);
 
             JButton submitButton = new JButton("Next");
             gbc.gridx = 1;
             gbc.gridy = 7;
             gbc.gridwidth = 2;
             submitButton.addActionListener(e -> {
-                if (dayField.getText().isEmpty() && monthField.getText().isEmpty() && yearField.getText().isEmpty() &&
-                        meDiagnosisField.getText().isEmpty() && medicineField.getText().isEmpty()) {
+                if (dayField.getText().isEmpty() && monthField.getText().isEmpty() && yearField.getText().isEmpty() ) {
                     Main.frame.getContentPane().removeAll();
                     docNav();
                     Main.frame.add(urPatNav(), BorderLayout.WEST);
                     Main.frame.add(addPat(2, tempPat), BorderLayout.CENTER);
-                } else if (dayField.getText().isEmpty() || monthField.getText().isEmpty() || yearField.getText().isEmpty() ||
-                        meDiagnosisField.getText().isEmpty() || medicineField.getText().isEmpty()) {
+                } else if (dayField.getText().isEmpty() || monthField.getText().isEmpty() || yearField.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(Main.frame, "Something seems wrong. Try again.");
                     Main.frame.getContentPane().removeAll();
                     docNav();
@@ -670,8 +665,6 @@ public class Doctor extends Human {
                     tempPat.appointment = new MedicalHistory(this);
                     tempPat.appointment.doc = this;
                     tempPat.patDoc = this;
-                    tempPat.appointment.medicalDiagnosis = meDiagnosisField.getText();
-                    tempPat.appointment.medicalDiagnosis = medicineField.getText();
                     try {
                         int day1 = Integer.parseInt(dayField.getText());
                         int month1 = Integer.parseInt(monthField.getText());
@@ -693,12 +686,13 @@ public class Doctor extends Human {
             });
             panel.add(submitButton, gbc);
         } else {
+            assert patient != null;
             JLabel FName = new JLabel(patient.toString());
             gbc.gridx = 0;
             gbc.gridy = 0;
             panel.add(FName, gbc);
 
-            JButton saveButton = new JButton("Next");
+            JButton saveButton = new JButton("save");
             gbc.gridx = 4;
             gbc.gridy = 4;
             gbc.gridwidth = 2;

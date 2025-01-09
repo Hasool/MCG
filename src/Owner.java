@@ -1,13 +1,11 @@
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -26,6 +24,19 @@ public class Owner {
         password = "admin";
     }
 
+    private JButton createNavButton(String text,boolean enable , ActionListener action) {
+        JButton button = new JButton(text);
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setEnabled(enable);
+        button.setMaximumSize(new Dimension(200, 30));
+        button.setBackground(Main.mainBtn);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Arial", Font.BOLD, 12));
+        button.addActionListener(action);
+        return button;
+    }
+
 
     public void Owners(boolean isLoggedIn) {
         Main.frame.getContentPane().removeAll();
@@ -37,19 +48,14 @@ public class Owner {
 
             ownerPanel.add(Box.createRigidArea(new Dimension(10, 50)));
 
-            JLabel welcomeLabel = new JLabel("Welcome, Owner!");
+            JLabel welcomeLabel = new JLabel("Welcome, Admin!");
             welcomeLabel.setForeground(Main.mainBtn);
             welcomeLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
             ownerPanel.add(welcomeLabel);
 
             ownerPanel.add(Box.createRigidArea(new Dimension(50, 50)));
 
-            JButton doctorSettingsButton = new JButton("Doctor Settings");
-            doctorSettingsButton.setMaximumSize(new Dimension(200, 30));
-            doctorSettingsButton.setBackground(Main.mainBtn);
-            doctorSettingsButton.setBorder(null);
-            doctorSettingsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-            doctorSettingsButton.addActionListener(e -> {
+            JButton doctorSettingsButton = createNavButton("Doctor Settings",true,e -> {
                 Main.frame.getContentPane().removeAll();
                 Owners(true);
                 Main.frame.add(DocSettings(), BorderLayout.WEST);
@@ -60,12 +66,7 @@ public class Owner {
 
             ownerPanel.add(Box.createRigidArea(new Dimension(30, 0)));
 
-            JButton patientSettingsButton = new JButton("Patient Settings");
-            patientSettingsButton.setMaximumSize(new Dimension(200, 30));
-            patientSettingsButton.setBackground(Main.mainBtn);
-            patientSettingsButton.setBorder(null);
-            patientSettingsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-            patientSettingsButton.addActionListener(e -> {
+            JButton patientSettingsButton = createNavButton("Patient Settings",true,e -> {
                 Main.frame.getContentPane().removeAll();
                 Owners(true);
                 Main.frame.add(PatSettings(), BorderLayout.WEST);
@@ -76,12 +77,7 @@ public class Owner {
 
             ownerPanel.add(Box.createRigidArea(new Dimension(30, 0)));
 
-            JButton changeCredentialsButton = new JButton("Change Name/Password");
-            changeCredentialsButton.setMaximumSize(new Dimension(200, 30));
-            changeCredentialsButton.setBackground(Main.mainBtn);
-            changeCredentialsButton.setBorder(null);
-            changeCredentialsButton.setAlignmentY(Component.CENTER_ALIGNMENT);
-            changeCredentialsButton.addActionListener(e -> {
+            JButton changeCredentialsButton = createNavButton("Change Name/Password",true,e -> {
                 Main.frame.getContentPane().removeAll();
                 Owners(true);
                 Main.frame.add(change(), BorderLayout.CENTER);
@@ -91,13 +87,8 @@ public class Owner {
             ownerPanel.add(changeCredentialsButton);
 
             ownerPanel.add(Box.createRigidArea(new Dimension(30, 0)));
-            JButton requestsBtn = new JButton("Request");
-            requestsBtn.setBackground(Main.mainBtn);
-            requestsBtn.setBorder(null);
-            requestsBtn.setEnabled(!requests.isEmpty());
-            requestsBtn.setAlignmentY(Component.CENTER_ALIGNMENT);
-            requestsBtn.setMaximumSize(new Dimension(200, 30));
-            requestsBtn.addActionListener(e -> {
+
+            JButton requestsBtn = createNavButton("Request",!requests.isEmpty(),e -> {
                 Main.frame.getContentPane().removeAll();
                 Owners(true);
                 Main.frame.add(req(), BorderLayout.CENTER);
@@ -134,10 +125,18 @@ public class Owner {
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.insets = new Insets(5, 5, 5, 5);
 
+            JLabel somthing = new JLabel("enter admin as name / password ");
+            if (Objects.equals(name, "admin") && Objects.equals(password, "admin")){
+                somthing.setForeground(Main.mainBtn);
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+                loginPanel.add(somthing,gbc);
+            }
+
             JLabel nameLabel = new JLabel("Enter your name:");
             nameLabel.setForeground(Main.mainBtn);
             gbc.gridx = 0;
-            gbc.gridy = 0;
+            gbc.gridy = 1;
             loginPanel.add(nameLabel, gbc);
 
             JTextField nameField = new JTextField(15);
@@ -147,7 +146,7 @@ public class Owner {
             JLabel passwordLabel = new JLabel("Enter your password:");
             passwordLabel.setForeground(Main.mainBtn);
             gbc.gridx = 0;
-            gbc.gridy = 1;
+            gbc.gridy = 2;
             loginPanel.add(passwordLabel, gbc);
 
             JPasswordField passwordField = new JPasswordField(15);
@@ -157,7 +156,7 @@ public class Owner {
             JButton submitButton = new JButton("Submit");
             submitButton.setBackground(Main.mainBtn);
             gbc.gridx = 0;
-            gbc.gridy = 2;
+            gbc.gridy = 3;
             gbc.gridwidth = 2;
             submitButton.addActionListener(e -> {
                 String inputName = nameField.getText();
