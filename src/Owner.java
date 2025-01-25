@@ -924,7 +924,7 @@ public class Owner {
                     Main.frame.getContentPane().removeAll();
                     Owners(true);
                     Main.frame.add(DocSettings(), BorderLayout.WEST);
-                    Main.frame.add(addDoc(2,doctor),BorderLayout.CENTER);
+                    Main.frame.add((editDoctor(2,doctor)),BorderLayout.CENTER);
                 }
                 Main.frame.revalidate();
                 Main.frame.repaint();
